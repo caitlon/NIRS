@@ -1,0 +1,38 @@
+# Popis projektu NIRS
+
+### Soubory :
+
+1. **1_NIR_Tomato_EDA.ipynb**
+   - Průzkumná analýza dat NIR spekter rajčat
+   - Analyzuje 432 vzorků rajčat se 125 spektrálními vlnovými délkami (908-1676 nm)
+   - Vizualizuje NIR spektra a distribuci hodnot Brix (3,3 až 6,1)
+   - Identifikuje klíčové oblasti vlnových délek (957-982 nm a 1366-1391 nm)
+   - Zkoumá variabilitu obsahu cukru mezi rostlinami
+
+2. **2_NIR_Tomato_Preprocessing.ipynb**
+   - Předzpracování spektrálních dat NIR
+   - Čištění dat (odstranění neinformativních sloupců a odlehlých hodnot)
+   - Aplikace technik spektrálního předzpracování (SNV, Savitzky-Golay derivace, MSC)
+   - Redukce dimenzí pomocí PCA
+   - Rozdělení dat na trénovací, validační a testovací sady
+
+3. **3_NIR_Tomato_Modeling_with_NIR_pipelines.ipynb**
+   - Implementace prediktivních modelů pro odhad hodnot Brix z NIR spekter
+   - Testování různých regresních modelů (Random Forest, SVR, ElasticNet, XGBoost, LightGBM)
+   - Optimalizace neuronové sítě (MLP) s různými technikami předzpracování
+   - Nejlepší model: MLP s MSC předzpracováním, dosahuje validační RMSE 0,2895 a R² 0,7645
+   - Finální vyhodnocení modelu na testovací sadě: RMSE 0,3200 a R² 0,6914
+
+4. **nir_preprocessing.py**
+   - Modul Python definující vlastní třídy a funkce pro předzpracování dat NIR spektroskopie
+   - SNVTransformer: Aplikuje transformaci Standard Normal Variate
+   - SavGolTransformer: Implementuje Savitzky-Golay filtrování
+   - MSCTransformer: Provádí Multiplicative Scatter Correction
+   - create_preprocessing_pipelines(): Vytváří standardizované pipeline pro různé metody
+   - save_processed_data(): Ukládá předzpracované datasety
+
+5. **Soubory .joblib**
+   - nir_tomato_best_mlp_with_nir_model.joblib: Ukládá nejlepší model MLP s NIR předzpracováním
+   - nir_tomato_data_splits.joblib: Obsahuje indexy pro rozdělení dat
+   - nir_tomato_model_details_with_nir_preprocessing.joblib: Ukládá metriky a parametry modelu
+   - nir_tomato_processed_dataset.joblib: Obsahuje předzpracovaný dataset
