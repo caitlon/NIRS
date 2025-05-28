@@ -1,27 +1,58 @@
-# NIRS - NIR Spectroscopy Analysis for Tomatoes
+# 🍅 NIRS - NIR Spectroscopy Analysis for Tomatoes
 
-NIRS is a Python package for the analysis of Near-Infrared Spectroscopy (NIR) data for tomato quality assessment. The package provides tools for data processing, transformation, and modeling of NIR spectra to predict tomato quality parameters such as Soluble Solids Content (SSC), lycopene content, and other metrics.
+> Analysis of tomato quality using Near-Infrared Spectroscopy (NIR)
 
-## Features
+[![Python](https://img.shields.io/badge/Python-3.8%2B-blue)](https://www.python.org/)
+[![MLflow](https://img.shields.io/badge/MLflow-2.0%2B-brightgreen)](https://mlflow.org/)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-- Pre-processing of NIR spectral data:
+<p align="center">
+  <img src="https://github.com/user/NIRS/raw/main/images/tomato_nir_banner.png" alt="Tomato NIR Spectroscopy" width="600">
+</p>
+
+## 📑 Table of Contents
+
+- [✨ Features](#-features)
+- [🚀 Installation](#-installation)
+- [📊 Usage](#-usage)
+  - [Data Processing](#data-processing)
+  - [Model Training](#model-training)
+  - [Running Experiments](#running-experiments)
+  - [Data Visualization](#data-visualization)
+- [📈 Experiment Tracking with MLflow](#-experiment-tracking-with-mlflow)
+  - [Setup and Installation](#setup-and-installation)
+  - [Running Experiments with MLflow](#running-experiments-with-mlflow)
+  - [Viewing Results via MLflow UI](#viewing-results-via-mlflow-ui)
+  - [Setting up Remote Tracking](#setting-up-remote-tracking)
+  - [Programmatic Usage of MLflow API](#programmatic-usage-of-mlflow-api)
+  - [Structure of Experiment Tracking](#structure-of-experiment-tracking)
+  - [MLflow Server Setup](#mlflow-server-setup)
+  - [Security for Remote Access](#security-for-remote-access)
+- [📂 Project Structure](#-project-structure)
+
+## ✨ Features
+
+- 🔍 **Pre-processing of NIR spectral data**:
   - Spectral transformations (SNV, MSC)
   - Savitzky-Golay filtering
   - Automatic detection and filtering of non-numeric columns
   - Outlier detection and removal
-- Modeling of NIR data:
+
+- 🧠 **Modeling of NIR data**:
   - PLS regression
   - Support Vector Regression (SVR)
   - Random Forest regression
   - XGBoost regression
-- Evaluation and visualization of model results
-- Experiment tracking with MLflow:
+
+- 📊 **Evaluation and visualization of results**
+
+- 📈 **Experiment tracking with MLflow**:
   - Parameter logging
   - Metrics tracking
   - Model artifacts storage
   - Feature importance visualization
 
-## Installation
+## 🚀 Installation
 
 Clone this repository and install the package using pip:
 
@@ -31,11 +62,11 @@ cd NIRS
 pip install -e ".[dev]"
 ```
 
-## Usage
+## 📊 Usage
 
 ### Data Processing
 
-The package provides several tools for data processing, including transformers for spectral data, utilities for data cleaning, and pipelines for complete data processing workflows.
+The package provides tools for data processing, including transformers for spectral data, utilities for data cleaning, and pipelines for complete data processing workflows.
 
 ```python
 from nirs.data_processing.transformers import SNVTransformer
@@ -77,7 +108,7 @@ python scripts/train_model.py --data data/tomato_spectra.csv --target SSC --mode
 python scripts/train_model.py --data data/tomato_spectra.csv --target SSC --model rf --transform snv --exclude_columns "Notes" "Timestamp" "Instrument Serial Number"
 ```
 
-Note: The script automatically filters out common non-numeric columns that can't be used for modeling, including 'Instrument Serial Number', 'Notes', 'Timestamp', 'Integration Time', 'wetlab ID', and 'Lab'.
+> **Note**: The script automatically filters out common non-numeric columns that can't be used for modeling.
 
 #### Using Python functions
 
@@ -100,7 +131,7 @@ metrics, y_pred = evaluate_regression_model(model, X_test, y_test)
 print_regression_metrics(metrics)
 ```
 
-### Running Multiple Experiments
+### Running Experiments
 
 The package provides a script for running multiple experiments with different models and preprocessing methods:
 
@@ -132,7 +163,7 @@ plot_transformed_spectra(X, title='Transformed Tomato NIR Spectra')
 plt.show()
 ```
 
-## Experiment Tracking with MLflow
+## 📈 Experiment Tracking with MLflow
 
 The project integrates MLflow for experiment tracking, allowing you to monitor and compare model performance, hyperparameters, and feature importance.
 
@@ -150,7 +181,7 @@ Or update the package installation in development mode:
 pip install -e ".[dev]"
 ```
 
-### Running Experiments with MLflow Tracking
+### Running Experiments with MLflow
 
 To track experiments through MLflow, you can use the `run_experiments.py` script:
 
@@ -174,11 +205,15 @@ Then open in browser: http://127.0.0.1:5000
 
 #### MLflow Interface Screenshots
 
-![MLflow Experiments Overview](images/mlflow_experiments.png)
-*Figure 1: MLflow Experiments overview with comparison of multiple models*
+<p align="center">
+  <img src="images/mlflow_experiments.png" alt="MLflow Experiments Overview" width="800"><br>
+  <em>MLflow Experiments overview with comparison of multiple models</em>
+</p>
 
-![MLflow Experiment Details](images/mlflow_experiment_details.png)
-*Figure 2: Detailed view of a specific experiment showing hyperparameters and metrics*
+<p align="center">
+  <img src="images/mlflow_experiment_details.png" alt="MLflow Experiment Details" width="800"><br>
+  <em>Detailed view of a specific experiment showing hyperparameters and metrics</em>
+</p>
 
 ### Setting up Remote Tracking
 
@@ -253,7 +288,7 @@ log_model(trained_model, "model")
 end_run()
 ```
 
-### Structure of Experiment Tracking in MLflow
+### Structure of Experiment Tracking
 
 When running a series of experiments through `run_experiments.py` with the `--use_mlflow` flag:
 
@@ -266,7 +301,7 @@ This allows:
 - Comparing all experiments
 - Quickly finding the best models
 
-### Setting up MLflow Server for Permanent Use
+### MLflow Server Setup
 
 For long-term use, it is recommended to configure the MLflow server with:
 
@@ -291,7 +326,7 @@ If you're opening MLflow for internet access, be sure to:
 3. Restrict access by IP if possible
 4. Monitor MLflow updates to address vulnerabilities
 
-## Project Structure
+## 📂 Project Structure
 
 ```
 NIRS/
