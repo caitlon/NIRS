@@ -309,16 +309,3 @@ NIRS/
 ├── setup.py               # Package installation script
 └── requirements.txt       # Package dependencies
 ```
-
-## Additional Resources
-
-- [MLflow Documentation](https://mlflow.org/docs/latest/index.html)
-- [Examples of MLflow Usage](https://github.com/mlflow/mlflow/tree/master/examples)
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Acknowledgements
-
-This package is based on research in NIR spectroscopy for food quality assessment and builds upon scientific methods developed in the field. 
