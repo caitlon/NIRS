@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/438942216442350987/522b4468885e4951b2bc6f9e87d8f284/artifacts
+end_time: 1748453597850
+entry_point_name: ''
+experiment_id: '438942216442350987'
+lifecycle_stage: active
+run_id: 522b4468885e4951b2bc6f9e87d8f284
+run_name: pls_snv_savgol_cars20_20250528_193313
+run_uuid: 522b4468885e4951b2bc6f9e87d8f284
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1748453593787
+status: 3
+tags: []
+user_id: katyabiser

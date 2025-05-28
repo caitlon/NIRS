@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/438942216442350987/6b7affbca00d4316b59232cc6c88cd9b/artifacts
+end_time: 1748453513629
+entry_point_name: ''
+experiment_id: '438942216442350987'
+lifecycle_stage: active
+run_id: 6b7affbca00d4316b59232cc6c88cd9b
+run_name: experiment_set_20250528_193153
+run_uuid: 6b7affbca00d4316b59232cc6c88cd9b
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1748453513623
+status: 3
+tags: []
+user_id: katyabiser

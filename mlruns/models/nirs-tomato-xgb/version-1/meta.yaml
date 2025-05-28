@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1748452167821
+current_stage: None
+description: null
+last_updated_timestamp: 1748452167821
+name: nirs-tomato-xgb
+run_id: 40d72db0c05f4fc98a7fd12474f8602f
+run_link: null
+source: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/438942216442350987/40d72db0c05f4fc98a7fd12474f8602f/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/438942216442350987/40d72db0c05f4fc98a7fd12474f8602f/artifacts/model
+user_id: null
+version: 1
