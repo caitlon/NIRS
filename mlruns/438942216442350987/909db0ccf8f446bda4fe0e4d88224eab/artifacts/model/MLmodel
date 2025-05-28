@@ -1,0 +1,116 @@
+artifact_path: model
+flavors:
+  python_function:
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    predict_fn: predict
+    python_version: 3.10.16
+  sklearn:
+    code: null
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 1.6.1
+is_signature_from_type_hint: false
+mlflow_version: 2.22.0
+model_size_bytes: 297415
+model_uuid: fb2be95794744248aafed0266a891f5c
+prompts: null
+run_id: 909db0ccf8f446bda4fe0e4d88224eab
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  serving_input_path: serving_input_example.json
+  type: dataframe
+signature:
+  inputs: '[{"type": "double", "name": "908.1", "required": true}, {"type": "double",
+    "name": "914.294", "required": true}, {"type": "double", "name": "920.489", "required":
+    true}, {"type": "double", "name": "926.683", "required": true}, {"type": "double",
+    "name": "932.877", "required": true}, {"type": "double", "name": "939.072", "required":
+    true}, {"type": "double", "name": "945.266", "required": true}, {"type": "double",
+    "name": "951.46", "required": true}, {"type": "double", "name": "957.655", "required":
+    true}, {"type": "double", "name": "963.849", "required": true}, {"type": "double",
+    "name": "970.044", "required": true}, {"type": "double", "name": "976.238", "required":
+    true}, {"type": "double", "name": "982.432", "required": true}, {"type": "double",
+    "name": "988.627", "required": true}, {"type": "double", "name": "994.821", "required":
+    true}, {"type": "double", "name": "1001.015", "required": true}, {"type": "double",
+    "name": "1007.21", "required": true}, {"type": "double", "name": "1013.404", "required":
+    true}, {"type": "double", "name": "1019.598", "required": true}, {"type": "double",
+    "name": "1025.793", "required": true}, {"type": "double", "name": "1031.987",
+    "required": true}, {"type": "double", "name": "1038.181", "required": true}, {"type":
+    "double", "name": "1044.376", "required": true}, {"type": "double", "name": "1050.57",
+    "required": true}, {"type": "double", "name": "1056.764", "required": true}, {"type":
+    "double", "name": "1062.959", "required": true}, {"type": "double", "name": "1069.153",
+    "required": true}, {"type": "double", "name": "1075.348", "required": true}, {"type":
+    "double", "name": "1081.542", "required": true}, {"type": "double", "name": "1087.736",
+    "required": true}, {"type": "double", "name": "1093.931", "required": true}, {"type":
+    "double", "name": "1100.125", "required": true}, {"type": "double", "name": "1106.319",
+    "required": true}, {"type": "double", "name": "1112.514", "required": true}, {"type":
+    "double", "name": "1118.708", "required": true}, {"type": "double", "name": "1124.902",
+    "required": true}, {"type": "double", "name": "1131.097", "required": true}, {"type":
+    "double", "name": "1137.291", "required": true}, {"type": "double", "name": "1143.485",
+    "required": true}, {"type": "double", "name": "1149.68", "required": true}, {"type":
+    "double", "name": "1155.874", "required": true}, {"type": "double", "name": "1162.069",
+    "required": true}, {"type": "double", "name": "1168.263", "required": true}, {"type":
+    "double", "name": "1174.457", "required": true}, {"type": "double", "name": "1180.652",
+    "required": true}, {"type": "double", "name": "1186.846", "required": true}, {"type":
+    "double", "name": "1193.04", "required": true}, {"type": "double", "name": "1199.235",
+    "required": true}, {"type": "double", "name": "1205.429", "required": true}, {"type":
+    "double", "name": "1211.623", "required": true}, {"type": "double", "name": "1217.818",
+    "required": true}, {"type": "double", "name": "1224.012", "required": true}, {"type":
+    "double", "name": "1230.206", "required": true}, {"type": "double", "name": "1236.401",
+    "required": true}, {"type": "double", "name": "1242.595", "required": true}, {"type":
+    "double", "name": "1248.789", "required": true}, {"type": "double", "name": "1254.984",
+    "required": true}, {"type": "double", "name": "1261.178", "required": true}, {"type":
+    "double", "name": "1267.373", "required": true}, {"type": "double", "name": "1273.567",
+    "required": true}, {"type": "double", "name": "1279.761", "required": true}, {"type":
+    "double", "name": "1285.956", "required": true}, {"type": "double", "name": "1292.15",
+    "required": true}, {"type": "double", "name": "1298.344", "required": true}, {"type":
+    "double", "name": "1304.539", "required": true}, {"type": "double", "name": "1310.733",
+    "required": true}, {"type": "double", "name": "1316.927", "required": true}, {"type":
+    "double", "name": "1323.122", "required": true}, {"type": "double", "name": "1329.316",
+    "required": true}, {"type": "double", "name": "1335.51", "required": true}, {"type":
+    "double", "name": "1341.705", "required": true}, {"type": "double", "name": "1347.899",
+    "required": true}, {"type": "double", "name": "1354.094", "required": true}, {"type":
+    "double", "name": "1360.288", "required": true}, {"type": "double", "name": "1366.482",
+    "required": true}, {"type": "double", "name": "1372.677", "required": true}, {"type":
+    "double", "name": "1378.871", "required": true}, {"type": "double", "name": "1385.065",
+    "required": true}, {"type": "double", "name": "1391.26", "required": true}, {"type":
+    "double", "name": "1397.454", "required": true}, {"type": "double", "name": "1403.648",
+    "required": true}, {"type": "double", "name": "1409.843", "required": true}, {"type":
+    "double", "name": "1416.037", "required": true}, {"type": "double", "name": "1422.231",
+    "required": true}, {"type": "double", "name": "1428.426", "required": true}, {"type":
+    "double", "name": "1434.62", "required": true}, {"type": "double", "name": "1440.814",
+    "required": true}, {"type": "double", "name": "1447.009", "required": true}, {"type":
+    "double", "name": "1453.203", "required": true}, {"type": "double", "name": "1459.398",
+    "required": true}, {"type": "double", "name": "1465.592", "required": true}, {"type":
+    "double", "name": "1471.786", "required": true}, {"type": "double", "name": "1477.981",
+    "required": true}, {"type": "double", "name": "1484.175", "required": true}, {"type":
+    "double", "name": "1490.369", "required": true}, {"type": "double", "name": "1496.564",
+    "required": true}, {"type": "double", "name": "1502.758", "required": true}, {"type":
+    "double", "name": "1508.952", "required": true}, {"type": "double", "name": "1515.147",
+    "required": true}, {"type": "double", "name": "1521.341", "required": true}, {"type":
+    "double", "name": "1527.535", "required": true}, {"type": "double", "name": "1533.73",
+    "required": true}, {"type": "double", "name": "1539.924", "required": true}, {"type":
+    "double", "name": "1546.119", "required": true}, {"type": "double", "name": "1552.313",
+    "required": true}, {"type": "double", "name": "1558.507", "required": true}, {"type":
+    "double", "name": "1564.702", "required": true}, {"type": "double", "name": "1570.896",
+    "required": true}, {"type": "double", "name": "1577.09", "required": true}, {"type":
+    "double", "name": "1583.285", "required": true}, {"type": "double", "name": "1589.479",
+    "required": true}, {"type": "double", "name": "1595.673", "required": true}, {"type":
+    "double", "name": "1601.868", "required": true}, {"type": "double", "name": "1608.062",
+    "required": true}, {"type": "double", "name": "1614.256", "required": true}, {"type":
+    "double", "name": "1620.451", "required": true}, {"type": "double", "name": "1626.645",
+    "required": true}, {"type": "double", "name": "1632.839", "required": true}, {"type":
+    "double", "name": "1639.034", "required": true}, {"type": "double", "name": "1645.228",
+    "required": true}, {"type": "double", "name": "1651.423", "required": true}, {"type":
+    "double", "name": "1657.617", "required": true}, {"type": "double", "name": "1663.811",
+    "required": true}, {"type": "double", "name": "1670.006", "required": true}, {"type":
+    "double", "name": "1676.2", "required": true}, {"type": "double", "name": "Temperature",
+    "required": true}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-05-28 18:44:52.071032'

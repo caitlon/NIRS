@@ -1,0 +1,15 @@
+artifact_uri: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/438942216442350987/87e5cf912fd842148af59683d610593e/artifacts
+end_time: 1748458307864
+entry_point_name: ''
+experiment_id: '438942216442350987'
+lifecycle_stage: active
+run_id: 87e5cf912fd842148af59683d610593e
+run_name: xgb_snv_savgol_vip20_20250528_205143
+run_uuid: 87e5cf912fd842148af59683d610593e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1748458303578
+status: 3
+tags: []
+user_id: katyabiser
