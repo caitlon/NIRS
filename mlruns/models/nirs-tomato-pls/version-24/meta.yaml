@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1748468051081
+current_stage: None
+description: null
+last_updated_timestamp: 1748468051081
+name: nirs-tomato-pls
+run_id: 4bf873e66d1545c18eaad48d175e9e0c
+run_link: null
+source: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/867851196026898299/4bf873e66d1545c18eaad48d175e9e0c/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/867851196026898299/4bf873e66d1545c18eaad48d175e9e0c/artifacts/model
+user_id: null
+version: 24

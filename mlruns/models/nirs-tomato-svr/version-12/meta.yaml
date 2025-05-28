@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1748468039291
+current_stage: None
+description: null
+last_updated_timestamp: 1748468039291
+name: nirs-tomato-svr
+run_id: 80174884985845b6a9bda37cef788393
+run_link: null
+source: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/867851196026898299/80174884985845b6a9bda37cef788393/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/867851196026898299/80174884985845b6a9bda37cef788393/artifacts/model
+user_id: null
+version: 12
