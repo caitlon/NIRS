@@ -27,9 +27,9 @@ import matplotlib.pyplot as plt
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.cross_decomposition import PLSRegression
 
-from src.data_processing.transformers import SNVTransformer, MSCTransformer, SavGolTransformer
-from src.data_processing.pipeline import preprocess_spectra
-from src.data_processing.feature_selection import (
+from nirs_tomato.data_processing.transformers import SNVTransformer, MSCTransformer, SavGolTransformer
+from nirs_tomato.data_processing.pipeline import preprocess_spectra
+from nirs_tomato.data_processing.feature_selection import (
     GeneticAlgorithmSelector, 
     CARSSelector, 
     PLSVIPSelector
@@ -169,9 +169,9 @@ def main():
         else:
             logger.info(f"Applying {args.feature_selection.upper()} feature selection")
             
-            # Identify wavelength columns
-            from src.data_processing.utils import identify_spectral_columns
-            spectral_cols, _ = identify_spectral_columns(X)
+            # Identify spectral columns
+            from nirs_tomato.data_processing.utils import identify_spectral_columns
+            spectral_cols, non_spectral_cols = identify_spectral_columns(df)
             wavelengths = np.array([float(col) for col in spectral_cols])
             
             if args.feature_selection == "ga":

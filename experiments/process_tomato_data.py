@@ -19,8 +19,8 @@ from pathlib import Path
 # Add parent directory to path to import the package
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from src.data_processing.pipeline import process_and_save_data
-from src.data_processing.constants import AVAILABLE_PREPROCESSING_METHODS
+from nirs_tomato.data_processing.pipeline import process_and_save_data
+from nirs_tomato.data_processing.constants import AVAILABLE_PREPROCESSING_METHODS
 
 def parse_args():
     """Parse command line arguments."""

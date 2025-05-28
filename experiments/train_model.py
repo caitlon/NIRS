@@ -30,20 +30,20 @@ from sklearn.pipeline import Pipeline
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.cross_decomposition import PLSRegression
 
-from src.data_processing.transformers import SNVTransformer, MSCTransformer, SavGolTransformer
-from src.data_processing.pipeline import preprocess_spectra
-from src.data_processing.feature_selection import (
+from nirs_tomato.data_processing.transformers import SNVTransformer, MSCTransformer, SavGolTransformer
+from nirs_tomato.data_processing.pipeline import preprocess_spectra
+from nirs_tomato.data_processing.feature_selection import (
     GeneticAlgorithmSelector, 
     CARSSelector, 
     PLSVIPSelector
 )
-from src.modeling.model_factory import (
+from nirs_tomato.modeling.model_factory import (
     create_pls_model,
     create_svr_model,
     create_rf_model,
     create_xgb_model
 )
-from src.modeling.evaluation import evaluate_regression_model, print_regression_metrics
+from nirs_tomato.modeling.evaluation import evaluate_regression_model, print_regression_metrics
 
 # Configure logging
 logging.basicConfig(
@@ -207,7 +207,7 @@ def main():
         logger.info(f"Applying {args.feature_selection.upper()} feature selection")
         
         # Identify wavelength columns
-        from src.data_processing.utils import identify_spectral_columns
+        from nirs_tomato.data_processing.utils import identify_spectral_columns
         spectral_cols, _ = identify_spectral_columns(X)
         wavelengths = np.array([float(col) for col in spectral_cols])
         

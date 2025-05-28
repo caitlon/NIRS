@@ -27,7 +27,7 @@ import numpy as np
 from datetime import datetime
 from typing import List, Dict, Any, Optional
 
-from src.modeling.tracking import (
+from nirs_tomato.modeling.tracking import (
     start_run, 
     log_parameters, 
     log_metrics, 
