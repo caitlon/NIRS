@@ -124,7 +124,7 @@ def run_experiment(
     """
     # Build command
     cmd = [
-        "python", "scripts/train_model.py",
+        "python", "experiments/train_model.py",
         "--data", data_path,
         "--target", target_column,
         "--model", model_type,
