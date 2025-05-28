@@ -7,7 +7,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 <p align="center">
-  <img src="https://github.com/user/NIRS/raw/main/images/tomato_nir_banner.png" alt="Tomato NIR Spectroscopy" width="600">
+  <img src="images/tomato.png" alt="Tomato NIR Spectroscopy" width="600">
 </p>
 
 ## 📑 Table of Contents
