@@ -1,0 +1,14 @@
+aliases: []
+creation_timestamp: 1748469758286
+current_stage: None
+description: null
+last_updated_timestamp: 1748469758286
+name: nirs-tomato-rf
+run_id: e53ba238046c499b816ace015432ba28
+run_link: null
+source: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/867851196026898299/e53ba238046c499b816ace015432ba28/artifacts/model
+status: READY
+status_message: null
+storage_location: file:///Users/katyabiser/Desktop/repos/NIRS/mlruns/867851196026898299/e53ba238046c499b816ace015432ba28/artifacts/model
+user_id: null
+version: 36

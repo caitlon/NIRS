@@ -1,0 +1,58 @@
+{
+  "model_type": "rf",
+  "parameters": {
+    "bootstrap": "True",
+    "ccp_alpha": "0.0",
+    "criterion": "squared_error",
+    "max_depth": "None",
+    "max_features": "1.0",
+    "max_leaf_nodes": "None",
+    "max_samples": "None",
+    "min_impurity_decrease": "0.0",
+    "min_samples_leaf": "1",
+    "min_samples_split": "2",
+    "min_weight_fraction_leaf": "0.0",
+    "monotonic_cst": "None",
+    "n_estimators": "100",
+    "n_jobs": "None",
+    "oob_score": "False",
+    "random_state": "42",
+    "verbose": "0",
+    "warm_start": "False"
+  },
+  "metrics": {
+    "rmse": 0.45795763073100093,
+    "mae": 0.34440996162804544,
+    "r2": 0.33481038522917417,
+    "explained_variance": 0.339802838999575
+  },
+  "features": [
+    "914.294",
+    "920.489",
+    "932.877",
+    "945.266",
+    "951.46",
+    "963.849",
+    "1019.598",
+    "1025.793",
+    "1031.987",
+    "1044.376",
+    "1056.764",
+    "1062.959",
+    "1137.291",
+    "1155.874",
+    "1162.069",
+    "1416.037",
+    "1428.426",
+    "1440.814",
+    "1447.009",
+    "1453.203"
+  ],
+  "data_file": "Tomato_Viavi_Brix_model_pulp.csv",
+  "preprocessing": {
+    "transform_type": "snv",
+    "use_savgol": true,
+    "feature_selection_method": "ga",
+    "n_features": 20
+  }
+}
