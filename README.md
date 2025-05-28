@@ -103,12 +103,12 @@ from nirs_tomato.data_processing.pipeline import preprocess_spectra
 import pandas as pd
 
 # Load data
-df = pd.read_csv('data/tomato_spectra.csv')
+df = pd.read_csv('data/raw/Tomato_Viavi_Brix_model_pulp.csv')
 
 # Process data
 results = preprocess_spectra(
     df=df,
-    target_column='SSC',
+    target_column='Brix',
     transformers=[SNVTransformer()],
     exclude_columns=['Instrument Serial Number', 'Notes', 'Timestamp'],
     remove_outliers=True,
@@ -128,13 +128,13 @@ The package provides command-line scripts for model training, as well as Python 
 
 ```bash
 # Train a PLS model with SNV transformation
-python experiments/train_model.py --data data/tomato_spectra.csv --target SSC --model pls --transform snv
+python experiments/train_model.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --target Brix --model pls --transform snv
 
 # Train an XGBoost model with MSC transformation and Savitzky-Golay filtering
-python experiments/train_model.py --data data/tomato_spectra.csv --target SSC --model xgb --transform msc --savgol --window_length 15 --polyorder 2 --tune_hyperparams
+python experiments/train_model.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --target Brix --model xgb --transform msc --savgol --window_length 15 --polyorder 2 --tune_hyperparams
 
 # Train a Random Forest model excluding specific columns
-python experiments/train_model.py --data data/tomato_spectra.csv --target SSC --model rf --transform snv --exclude_columns "Notes" "Timestamp" "Instrument Serial Number"
+python experiments/train_model.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --target Brix --model rf --transform snv --exclude_columns "Notes" "Timestamp" "Instrument Serial Number"
 ```
 
 > **Note**: The script automatically filters out common non-numeric columns that can't be used for modeling.
@@ -166,13 +166,13 @@ The package provides a script for running multiple experiments with different mo
 
 ```bash
 # Run a standard set of experiments
-python experiments/run_experiments.py --data data/tomato_spectra.csv
+python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv
 
 # Run experiments with feature selection methods
-python experiments/run_experiments.py --data data/tomato_spectra.csv --feature_selection
+python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --feature_selection
 
 # Track experiments with MLflow
-python experiments/run_experiments.py --data data/tomato_spectra.csv --use_mlflow
+python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --use_mlflow
 ```
 
 ### Data Visualization
