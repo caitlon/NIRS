@@ -13,4 +13,17 @@ from .regression_models import (
     load_model,
     plot_regression_results,
     compare_models
+)
+
+from .tracking import (
+    setup_mlflow,
+    start_run,
+    log_parameters,
+    log_metrics,
+    log_model,
+    log_figure,
+    log_artifact,
+    end_run,
+    get_tracking_uri,
+    create_remote_tracking_uri
 ) 
