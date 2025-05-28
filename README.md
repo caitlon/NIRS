@@ -13,6 +13,7 @@
 ## 📑 Table of Contents
 
 - [✨ Features](#-features)
+- [📂 Project Structure](#-project-structure)
 - [🚀 Installation](#-installation)
 - [📊 Usage](#-usage)
   - [Data Processing](#data-processing)
@@ -25,7 +26,6 @@
   - [Viewing Results via MLflow UI](#viewing-results-via-mlflow-ui)
   - [Programmatic Usage of MLflow API](#programmatic-usage-of-mlflow-api)
   - [Structure of Experiment Tracking](#structure-of-experiment-tracking)
-- [📂 Project Structure](#-project-structure)
 
 ## ✨ Features
 
@@ -49,6 +49,38 @@
   - Model artifacts storage
   - Feature importance visualization
 
+## 📂 Project Structure
+
+```
+NIRS/
+├── configs/                    # Configuration files for experiments
+├── data/                       # Data directory
+│   ├── raw/                    # Raw input data files
+│   └── processed/              # Processed data files
+├── experiments/                # Experiment scripts
+│   ├── analyze_models.py       # Script for analyzing model performance
+│   ├── process_data.py         # Data processing utilities
+│   ├── process_tomato_data.py  # Tomato-specific data processing
+│   ├── run_experiments.py      # Main experiments runner
+│   ├── run_mlflow_server.py    # MLflow server launcher
+│   └── train_model.py          # Model training script
+├── images/                     # Images for documentation
+├── mlruns/                     # MLflow experiment tracking data
+├── models/                     # Saved model files
+├── nirs_tomato/                # Main package
+│   ├── data_processing/        # Data processing modules
+│   ├── modeling/               # Modeling and evaluation modules
+│   └── __init__.py             # Package initialization
+├── results/                    # Experiment results and outputs
+├── tests/                      # Test files
+├── .gitignore                  # Git ignore file
+├── LICENSE                     # License file
+├── README.md                   # This file
+├── pyproject.toml              # Project configuration
+├── requirements.txt            # Python dependencies
+└── setup.py                    # Package setup script
+```
+
 ## 🚀 Installation
 
 Clone this repository and install the package using pip:
@@ -66,8 +98,8 @@ pip install -e ".[dev]"
 The package provides tools for data processing, including transformers for spectral data, utilities for data cleaning, and pipelines for complete data processing workflows.
 
 ```python
-from nirs.data_processing.transformers import SNVTransformer
-from nirs.data_processing.pipeline import preprocess_spectra
+from nirs_tomato.data_processing.transformers import SNVTransformer
+from nirs_tomato.data_processing.pipeline import preprocess_spectra
 import pandas as pd
 
 # Load data
@@ -96,13 +128,13 @@ The package provides command-line scripts for model training, as well as Python 
 
 ```bash
 # Train a PLS model with SNV transformation
-python scripts/train_model.py --data data/tomato_spectra.csv --target SSC --model pls --transform snv
+python experiments/train_model.py --data data/tomato_spectra.csv --target SSC --model pls --transform snv
 
 # Train an XGBoost model with MSC transformation and Savitzky-Golay filtering
-python scripts/train_model.py --data data/tomato_spectra.csv --target SSC --model xgb --transform msc --savgol --window_length 15 --polyorder 2 --tune_hyperparams
+python experiments/train_model.py --data data/tomato_spectra.csv --target SSC --model xgb --transform msc --savgol --window_length 15 --polyorder 2 --tune_hyperparams
 
 # Train a Random Forest model excluding specific columns
-python scripts/train_model.py --data data/tomato_spectra.csv --target SSC --model rf --transform snv --exclude_columns "Notes" "Timestamp" "Instrument Serial Number"
+python experiments/train_model.py --data data/tomato_spectra.csv --target SSC --model rf --transform snv --exclude_columns "Notes" "Timestamp" "Instrument Serial Number"
 ```
 
 > **Note**: The script automatically filters out common non-numeric columns that can't be used for modeling.
@@ -110,8 +142,8 @@ python scripts/train_model.py --data data/tomato_spectra.csv --target SSC --mode
 #### Using Python functions
 
 ```python
-from nirs.modeling.models import create_pls_model
-from nirs.modeling.evaluation import evaluate_regression_model, print_regression_metrics
+from nirs_tomato.modeling.models import create_pls_model
+from nirs_tomato.modeling.evaluation import evaluate_regression_model, print_regression_metrics
 from sklearn.model_selection import train_test_split
 
 # Split data
@@ -134,13 +166,13 @@ The package provides a script for running multiple experiments with different mo
 
 ```bash
 # Run a standard set of experiments
-python scripts/run_experiments.py --data data/tomato_spectra.csv
+python experiments/run_experiments.py --data data/tomato_spectra.csv
 
 # Run experiments with feature selection methods
-python scripts/run_experiments.py --data data/tomato_spectra.csv --feature_selection
+python experiments/run_experiments.py --data data/tomato_spectra.csv --feature_selection
 
 # Track experiments with MLflow
-python scripts/run_experiments.py --data data/tomato_spectra.csv --use_mlflow
+python experiments/run_experiments.py --data data/tomato_spectra.csv --use_mlflow
 ```
 
 ### Data Visualization
@@ -148,7 +180,7 @@ python scripts/run_experiments.py --data data/tomato_spectra.csv --use_mlflow
 The package provides tools for visualizing spectral data and model results.
 
 ```python
-from nirs.visualization.spectra import plot_spectra, plot_transformed_spectra
+from nirs_tomato.visualization.spectra import plot_spectra, plot_transformed_spectra
 import matplotlib.pyplot as plt
 
 # Plot raw spectra
@@ -184,10 +216,10 @@ To track experiments through MLflow, you can use the `run_experiments.py` script
 
 ```bash
 # Run experiments with MLflow tracking
-python scripts/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --use_mlflow
+python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --use_mlflow
 
 # Run experiments with feature selection and MLflow tracking
-python scripts/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --feature_selection --use_mlflow
+python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --feature_selection --use_mlflow
 ```
 
 ### Viewing Results via MLflow UI
@@ -195,7 +227,7 @@ python scripts/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.c
 To launch a local MLflow server with interface:
 
 ```bash
-python scripts/run_mlflow_server.py --host 127.0.0.1 --port 5000
+python experiments/run_mlflow_server.py --host 127.0.0.1 --port 5000
 ```
 
 Then open in browser: http://127.0.0.1:5000
@@ -214,10 +246,10 @@ Then open in browser: http://127.0.0.1:5000
 
 ### Programmatic Usage of MLflow API
 
-The project includes a module `src.modeling.tracking` with functions for working with MLflow:
+The project includes a module `nirs_tomato.modeling.tracking` with functions for working with MLflow:
 
 ```python
-from src.modeling.tracking import start_run, log_parameters, log_metrics, log_model, end_run
+from nirs_tomato.modeling.tracking import start_run, log_parameters, log_metrics, log_model, end_run
 
 # Start a new experiment
 start_run(run_name="experiment_name")
@@ -248,29 +280,10 @@ This allows:
 - Comparing all experiments
 - Quickly finding the best models
 
-## 📂 Project Structure
+## 📜 License
 
-```
-NIRS/
-├── configs/                # Configuration files
-├── data/                   # Data directory
-│   ├── processed/          # Processed data
-│   └── raw/                # Raw data files
-├── images/                 # Images for documentation
-├── mlruns/                 # MLflow experiment tracking data
-├── models/                 # Saved model files (.pkl)
-│   └── saved_models/       # Additional saved models
-├── notebooks/              # Jupyter notebooks
-├── results/                # Results and outputs
-├── scripts/                # Command-line scripts
-│   └── run_mlflow_server.py # Script to launch MLflow UI
-├── src/                    # Source code
-│   ├── data_processing/    # Data processing modules
-│   ├── modeling/           # Modeling modules
-│   │   └── tracking.py     # MLflow integration module
-│   └── visualization/      # Visualization modules
-├── tests/                  # Unit tests
-├── README.md               # This file
-├── setup.py                # Package installation script
-└── requirements.txt        # Package dependencies
-```
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 📧 Contact
+
+For questions and feedback, please contact the project maintainers.
