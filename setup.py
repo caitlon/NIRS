@@ -18,6 +18,7 @@ setup(
         "xgboost>=1.7.0",
         "lightgbm>=4.0.0",
         "joblib>=1.2.0",
+        "mlflow>=2.11.0",
     ],
     extras_require={
         'dev': [
@@ -30,6 +31,7 @@ setup(
             'openpyxl>=3.1.0',
             'statsmodels>=0.14.0',
             'tqdm>=4.65.0',
+            'boto3>=1.34.0',
         ],
     },
     python_requires='>=3.9',
