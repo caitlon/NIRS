@@ -9,6 +9,10 @@ trained model to disk for later use.
 Example:
     $ python train_model.py --data data/tomato_spectra.csv --target SSC 
                            --model pls --transform snv --savgol
+    
+    # With feature selection:
+    $ python train_model.py --data data/tomato_spectra.csv --target SSC 
+                           --model pls --transform snv --feature_selection vip --n_features 20
 """
 
 import argparse
@@ -23,9 +27,16 @@ import numpy as np
 import pandas as pd
 from sklearn.model_selection import GridSearchCV
 from sklearn.pipeline import Pipeline
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.cross_decomposition import PLSRegression
 
 from src.data_processing.transformers import SNVTransformer, MSCTransformer, SavGolTransformer
 from src.data_processing.pipeline import preprocess_spectra
+from src.data_processing.feature_selection import (
+    GeneticAlgorithmSelector, 
+    CARSSelector, 
+    PLSVIPSelector
+)
 from src.modeling.model_factory import (
     create_pls_model,
     create_svr_model,
@@ -81,6 +92,20 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--remove_outliers", action="store_true", 
         help="Detect and remove outliers"
+    )
+    
+    # Feature selection options
+    parser.add_argument(
+        "--feature_selection", type=str, choices=["none", "ga", "cars", "vip"], default="none",
+        help="Feature selection method to apply (ga=Genetic Algorithm, cars=Competitive Adaptive Reweighted Sampling, vip=Variable Importance in Projection)"
+    )
+    parser.add_argument(
+        "--n_features", type=int, default=20,
+        help="Number of features to select when using feature selection"
+    )
+    parser.add_argument(
+        "--plot_selection", action="store_true",
+        help="Plot selected features (saved to output_dir)"
     )
     
     # Model options
@@ -176,6 +201,81 @@ def main():
     logger.info(f"Training set shape: {X_train.shape}")
     logger.info(f"Test set shape: {X_test.shape}")
     
+    # Apply feature selection if requested
+    feature_selector = None
+    if args.feature_selection != "none":
+        logger.info(f"Applying {args.feature_selection.upper()} feature selection")
+        
+        # Identify wavelength columns
+        from src.data_processing.utils import identify_spectral_columns
+        spectral_cols, _ = identify_spectral_columns(X)
+        wavelengths = np.array([float(col) for col in spectral_cols])
+        
+        if args.feature_selection == "ga":
+            # For GA, we need a model to evaluate feature subsets
+            rf_model = RandomForestRegressor(n_estimators=50, random_state=42)
+            feature_selector = GeneticAlgorithmSelector(
+                estimator=rf_model,
+                n_features_to_select=args.n_features,
+                population_size=30,
+                n_generations=10,
+                wavelengths=wavelengths,
+                random_state=42
+            )
+        elif args.feature_selection == "cars":
+            feature_selector = CARSSelector(
+                n_pls_components=10,
+                n_sampling_runs=30,
+                n_features_to_select=args.n_features,
+                wavelengths=wavelengths,
+                random_state=42
+            )
+        elif args.feature_selection == "vip":
+            feature_selector = PLSVIPSelector(
+                n_components=10,
+                n_features_to_select=args.n_features,
+                wavelengths=wavelengths
+            )
+        
+        # Fit and transform data
+        feature_selector.fit(X_train, y_train)
+        X_train_selected = feature_selector.transform(X_train)
+        X_test_selected = feature_selector.transform(X_test)
+        
+        # Update data for modeling
+        X_train = X_train_selected
+        X_test = X_test_selected
+        
+        logger.info(f"Selected {X_train.shape[1]} features using {args.feature_selection.upper()}")
+        
+        # Plot selected features if requested
+        if args.plot_selection:
+            os.makedirs(args.output_dir, exist_ok=True)
+            timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            
+            if args.feature_selection == "ga":
+                plot = feature_selector.plot_selected_wavelengths()
+                plot_path = os.path.join(args.output_dir, f"ga_selected_features_{timestamp}.png")
+                plot.savefig(plot_path, dpi=300, bbox_inches='tight')
+                logger.info(f"Saved feature selection plot to {plot_path}")
+            elif args.feature_selection == "cars":
+                # Plot selection history
+                plot_history = feature_selector.plot_selection_history()
+                plot_history_path = os.path.join(args.output_dir, f"cars_selection_history_{timestamp}.png")
+                plot_history.savefig(plot_history_path, dpi=300, bbox_inches='tight')
+                
+                # Plot selected wavelengths
+                plot_wavelengths = feature_selector.plot_selected_wavelengths()
+                plot_wavelengths_path = os.path.join(args.output_dir, f"cars_selected_features_{timestamp}.png")
+                plot_wavelengths.savefig(plot_wavelengths_path, dpi=300, bbox_inches='tight')
+                
+                logger.info(f"Saved CARS plots to {args.output_dir}")
+            elif args.feature_selection == "vip":
+                plot = feature_selector.plot_vip_scores()
+                plot_path = os.path.join(args.output_dir, f"vip_scores_{timestamp}.png")
+                plot.savefig(plot_path, dpi=300, bbox_inches='tight')
+                logger.info(f"Saved VIP scores plot to {plot_path}")
+    
     # Create model
     logger.info(f"Creating {args.model.upper()} model")
     
@@ -214,7 +314,13 @@ def main():
     # Save model
     os.makedirs(args.output_dir, exist_ok=True)
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    model_filename = f"{args.model}_{args.target}_{timestamp}.pkl"
+    
+    # Include feature selection in model filename
+    fs_suffix = ""
+    if args.feature_selection != "none":
+        fs_suffix = f"_{args.feature_selection}{args.n_features}"
+    
+    model_filename = f"{args.model}_{args.target}{fs_suffix}_{timestamp}.pkl"
     model_path = os.path.join(args.output_dir, model_filename)
     
     logger.info(f"Saving model to {model_path}")
@@ -224,11 +330,16 @@ def main():
         'model': model,
         'preprocessing_pipeline': data['preprocessing_pipeline'],
         'spectral_columns': data['spectral_columns'],
-        'feature_names': list(X.columns),
+        'feature_names': list(X_train.columns if hasattr(X_train, 'columns') else [f"feature_{i}" for i in range(X_train.shape[1])]),
         'target': args.target,
         'metrics': metrics,
         'transform_type': args.transform,
         'savgol': args.savgol,
+        'feature_selection': {
+            'method': args.feature_selection,
+            'n_features': args.n_features if args.feature_selection != "none" else None,
+            'selector': feature_selector
+        },
         'training_date': timestamp
     }
     

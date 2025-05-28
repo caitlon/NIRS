@@ -7,6 +7,9 @@ hyperparameters and transformations, helping to find the best performing model.
 
 Example:
     $ python run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv
+    
+    # With feature selection methods:
+    $ python run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --feature_selection
 """
 
 import os
@@ -15,7 +18,7 @@ import subprocess
 import logging
 import pandas as pd
 from datetime import datetime
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 # Configure logging
 logging.basicConfig(
@@ -47,6 +50,10 @@ def parse_args() -> argparse.Namespace:
         "--verbose", action="store_true", 
         help="Enable verbose output"
     )
+    parser.add_argument(
+        "--feature_selection", action="store_true",
+        help="Run experiments with feature selection methods"
+    )
     
     return parser.parse_args()
 
@@ -57,6 +64,8 @@ def run_experiment(
     transform_type: str,
     use_savgol: bool = True,
     tune_hyperparams: bool = False,
+    feature_selection_method: Optional[str] = None,
+    n_features: int = 20,
     verbose: bool = False
 ) -> str:
     """
@@ -69,6 +78,8 @@ def run_experiment(
         transform_type: Transform type (snv, msc, none)
         use_savgol: Whether to apply Savitzky-Golay filtering
         tune_hyperparams: Whether to tune hyperparameters
+        feature_selection_method: Method for feature selection (ga, cars, vip, None)
+        n_features: Number of features to select
         verbose: Whether to use verbose output
         
     Returns:
@@ -90,6 +101,10 @@ def run_experiment(
     if tune_hyperparams:
         cmd.append("--tune_hyperparams")
     
+    if feature_selection_method:
+        cmd.extend(["--feature_selection", feature_selection_method])
+        cmd.extend(["--n_features", str(n_features)])
+    
     if verbose:
         cmd.append("--verbose")
     
@@ -99,6 +114,8 @@ def run_experiment(
         experiment_name += "_savgol"
     if tune_hyperparams:
         experiment_name += "_tuned"
+    if feature_selection_method:
+        experiment_name += f"_{feature_selection_method}{n_features}"
     
     logger.info(f"Running experiment: {experiment_name}")
     logger.info(f"Command: {' '.join(cmd)}")
@@ -176,10 +193,12 @@ def main():
     os.makedirs(args.results_dir, exist_ok=True)
     
     # Define experiments to run
-    experiments = [
+    experiments = []
+    
+    # Standard experiments without feature selection
+    standard_experiments = [
         # XGBoost experiments
         {"model_type": "xgb", "transform_type": "snv", "use_savgol": True, "tune_hyperparams": False},
-        {"model_type": "xgb", "transform_type": "snv", "use_savgol": True, "tune_hyperparams": False}, # Removing tune for XGBoost due to errors
         {"model_type": "xgb", "transform_type": "msc", "use_savgol": True, "tune_hyperparams": False},
         
         # Random Forest experiments
@@ -190,7 +209,46 @@ def main():
         # SVR experiments
         {"model_type": "svr", "transform_type": "snv", "use_savgol": True, "tune_hyperparams": False},
         {"model_type": "svr", "transform_type": "msc", "use_savgol": True, "tune_hyperparams": False},
+        
+        # PLS experiments
+        {"model_type": "pls", "transform_type": "snv", "use_savgol": True, "tune_hyperparams": True},
+        {"model_type": "pls", "transform_type": "msc", "use_savgol": True, "tune_hyperparams": True},
     ]
+    
+    # Add standard experiments
+    experiments.extend(standard_experiments)
+    
+    # Add feature selection experiments if enabled
+    if args.feature_selection:
+        feature_selection_experiments = []
+        
+        # Models to test with feature selection
+        models = ["pls", "xgb", "rf"]
+        
+        # Feature selection methods
+        fs_methods = [
+            {"method": "vip", "n_features": 20},
+            {"method": "vip", "n_features": 50},
+            {"method": "cars", "n_features": 20},
+            {"method": "cars", "n_features": 50},
+            {"method": "ga", "n_features": 20},
+            {"method": "ga", "n_features": 50},
+        ]
+        
+        # Create experiments with feature selection
+        for model in models:
+            for fs in fs_methods:
+                feature_selection_experiments.append({
+                    "model_type": model,
+                    "transform_type": "snv",
+                    "use_savgol": True,
+                    "tune_hyperparams": False,
+                    "feature_selection_method": fs["method"],
+                    "n_features": fs["n_features"]
+                })
+        
+        # Add feature selection experiments
+        experiments.extend(feature_selection_experiments)
     
     # Run experiments and collect results
     results = []
@@ -199,8 +257,10 @@ def main():
         exp_name = f"{exp['model_type']}_{exp['transform_type']}"
         if exp['use_savgol']:
             exp_name += "_savgol"
-        if exp['tune_hyperparams']:
+        if exp.get('tune_hyperparams', False):
             exp_name += "_tuned"
+        if exp.get('feature_selection_method'):
+            exp_name += f"_{exp['feature_selection_method']}{exp['n_features']}"
             
         logger.info(f"Starting experiment: {exp_name}")
         
@@ -211,7 +271,9 @@ def main():
             model_type=exp['model_type'],
             transform_type=exp['transform_type'],
             use_savgol=exp['use_savgol'],
-            tune_hyperparams=exp['tune_hyperparams'],
+            tune_hyperparams=exp.get('tune_hyperparams', False),
+            feature_selection_method=exp.get('feature_selection_method'),
+            n_features=exp.get('n_features', 20),
             verbose=args.verbose
         )
         
@@ -225,7 +287,9 @@ def main():
                 "model_type": exp['model_type'],
                 "transform_type": exp['transform_type'],
                 "use_savgol": exp['use_savgol'],
-                "tune_hyperparams": exp['tune_hyperparams'],
+                "tune_hyperparams": exp.get('tune_hyperparams', False),
+                "feature_selection_method": exp.get('feature_selection_method', 'none'),
+                "n_features": exp.get('n_features', 0),
                 "model_file": model_file,
                 "rmse": metrics.get('rmse', float('nan')),
                 "r2": metrics.get('r2', float('nan')),

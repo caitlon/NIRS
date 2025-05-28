@@ -31,6 +31,12 @@ from .pipeline import (
     prepare_data_for_regression
 )
 
+from .feature_selection import (
+    GeneticAlgorithmSelector,
+    CARSSelector,
+    PLSVIPSelector
+)
+
 from .constants import (
     TARGET_COLUMN,
     DEFAULT_DATASET_PATH,
