@@ -23,11 +23,8 @@
   - [Setup and Installation](#setup-and-installation)
   - [Running Experiments with MLflow](#running-experiments-with-mlflow)
   - [Viewing Results via MLflow UI](#viewing-results-via-mlflow-ui)
-  - [Setting up Remote Tracking](#setting-up-remote-tracking)
   - [Programmatic Usage of MLflow API](#programmatic-usage-of-mlflow-api)
   - [Structure of Experiment Tracking](#structure-of-experiment-tracking)
-  - [MLflow Server Setup](#mlflow-server-setup)
-  - [Security for Remote Access](#security-for-remote-access)
 - [📂 Project Structure](#-project-structure)
 
 ## ✨ Features
@@ -215,56 +212,6 @@ Then open in browser: http://127.0.0.1:5000
   <em>Detailed view of a specific experiment showing hyperparameters and metrics</em>
 </p>
 
-### Setting up Remote Tracking
-
-For collaborative use of results, MLflow can be configured to store data in a remote storage (S3, MinIO, etc.).
-
-#### Configuration with S3 (AWS)
-
-1. Set up necessary AWS credentials:
-
-```bash
-export AWS_ACCESS_KEY_ID=<your_access_key>
-export AWS_SECRET_ACCESS_KEY=<your_secret_key>
-export AWS_DEFAULT_REGION=<aws_region>
-```
-
-2. Launch MLflow server with S3 storage:
-
-```bash
-python scripts/run_mlflow_server.py --host 0.0.0.0 --port 5000 \
-    --backend-store-uri sqlite:///mlflow.db \
-    --artifacts-uri s3://bucket-name/artifacts-path
-```
-
-3. Training models with remote tracking:
-
-```bash
-python scripts/run_experiments.py --data <path_to_data> --use_mlflow \
-    --tracking_uri http://server-address:5000
-```
-
-#### Configuration with MinIO (S3-compatible storage)
-
-1. Install MinIO Server (locally or on a server):
-   - Follow instructions at: https://min.io/docs/minio/container/index.html
-
-2. Set up credentials:
-
-```bash
-export AWS_ACCESS_KEY_ID=<minio_access_key>
-export AWS_SECRET_ACCESS_KEY=<minio_secret_key>
-```
-
-3. Launch MLflow server with MinIO:
-
-```bash
-python scripts/run_mlflow_server.py --host 0.0.0.0 --port 5000 \
-    --backend-store-uri sqlite:///mlflow.db \
-    --artifacts-uri s3://mlflow \
-    --endpoint-url http://minio-address:9000
-```
-
 ### Programmatic Usage of MLflow API
 
 The project includes a module `src.modeling.tracking` with functions for working with MLflow:
@@ -301,46 +248,29 @@ This allows:
 - Comparing all experiments
 - Quickly finding the best models
 
-### MLflow Server Setup
-
-For long-term use, it is recommended to configure the MLflow server with:
-
-1. A database for metadata (e.g., PostgreSQL)
-2. Reliable storage for artifacts (S3, MinIO)
-3. A proxy server (e.g., nginx) with SSL encryption
-
-Example of launching with PostgreSQL:
-
-```bash
-python scripts/run_mlflow_server.py --host 0.0.0.0 --port 5000 \
-    --backend-store-uri postgresql://username:password@host:port/database \
-    --artifacts-uri s3://bucket-name/artifacts-path
-```
-
-### Security for Remote Access
-
-If you're opening MLflow for internet access, be sure to:
-
-1. Set up HTTPS via nginx or another proxy server
-2. Add basic authentication
-3. Restrict access by IP if possible
-4. Monitor MLflow updates to address vulnerabilities
-
 ## 📂 Project Structure
 
 ```
 NIRS/
-├── data/                  # Data directory
-├── models/                # Saved models
-├── scripts/               # Command-line scripts
-├── src/                   # Source code
-│   ├── data_processing/   # Data processing modules
-│   ├── modeling/          # Modeling modules
-│   │   └── tracking.py    # MLflow integration module
-│   └── visualization/     # Visualization modules
-├── tests/                 # Unit tests
-├── images/                # Images for documentation
-├── README.md              # This file
-├── setup.py               # Package installation script
-└── requirements.txt       # Package dependencies
+├── configs/                # Configuration files
+├── data/                   # Data directory
+│   ├── processed/          # Processed data
+│   └── raw/                # Raw data files
+├── images/                 # Images for documentation
+├── mlruns/                 # MLflow experiment tracking data
+├── models/                 # Saved model files (.pkl)
+│   └── saved_models/       # Additional saved models
+├── notebooks/              # Jupyter notebooks
+├── results/                # Results and outputs
+├── scripts/                # Command-line scripts
+│   └── run_mlflow_server.py # Script to launch MLflow UI
+├── src/                    # Source code
+│   ├── data_processing/    # Data processing modules
+│   ├── modeling/           # Modeling modules
+│   │   └── tracking.py     # MLflow integration module
+│   └── visualization/      # Visualization modules
+├── tests/                  # Unit tests
+├── README.md               # This file
+├── setup.py                # Package installation script
+└── requirements.txt        # Package dependencies
 ```
