@@ -28,6 +28,7 @@ from sklearn.svm import SVR
 from sklearn.linear_model import ElasticNet
 import xgboost as xgb
 import lightgbm as lgb
+from sklearn.cross_decomposition import PLSRegression
 
 # Set plotting style
 plt.style.use('seaborn-v0_8-whitegrid')
@@ -47,7 +48,7 @@ def train_regression_model(
     Args:
         X_train: Training features
         y_train: Training target values
-        model_type: Type of model to train ('rf', 'svr', 'elasticnet', 'xgb', 'lgbm', 'mlp')
+        model_type: Type of model to train ('rf', 'svr', 'elasticnet', 'xgb', 'lgbm', 'mlp', 'pls')
         model_params: Model hyperparameters
         random_state: Random seed for reproducibility
         verbose: Whether to print training information
@@ -139,6 +140,17 @@ def train_regression_model(
         }
         params = {**default_params, **model_params}
         model = MLPRegressor(**params)
+        
+    elif model_type == 'pls':
+        # Partial Least Squares Regression
+        default_params = {
+            'n_components': 10,
+            'scale': False,
+            'max_iter': 500,
+            'tol': 1e-6
+        }
+        params = {**default_params, **model_params}
+        model = PLSRegression(**params)
         
     else:
         raise ValueError(f"Unsupported model type: {model_type}")
