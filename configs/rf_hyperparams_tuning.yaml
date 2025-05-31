@@ -1,0 +1,44 @@
+# Random Forest model with Bayesian hyperparameter optimization
+name: rf_hyperparams_tuning
+description: Random Forest model with SNV preprocessing and Bayesian hyperparameter optimization
+
+# Input data configuration
+data:
+  data_path: data/raw/Tomato_Viavi_Brix_model_pulp.csv
+  target_column: Brix
+  transform: snv
+  exclude_columns: ["Notes", "Timestamp", "wetlab ID"]
+  remove_outliers: true
+  savgol:
+    enabled: false
+
+# Feature selection configuration
+feature_selection:
+  method: none
+  plot_selection: false
+
+# Model configuration
+model:
+  model_type: rf
+  test_size: 0.2
+  random_state: 42
+  tune_hyperparams: true  # Enable Bayesian optimization
+  n_trials: 30            # Number of trials for optimization
+  cv_folds: 3             # Number of cross-validation folds
+  
+  # These are the default parameters, but will be tuned
+  rf_n_estimators: 100
+  rf_max_depth: 15
+  rf_min_samples_split: 2
+  rf_min_samples_leaf: 1
+
+# MLflow tracking configuration
+mlflow:
+  enabled: true
+  experiment_name: nirs-tomato-brix-hyperopt
+  tracking_uri: null  # Use local mlruns directory
+
+# Output directories
+output_dir: models
+results_dir: results
+verbose: true 
