@@ -1,0 +1,36 @@
+name: pls_snv_savgol
+description: PLS regression with SNV transformation and Savitzky-Golay filtering for Brix prediction
+
+# Data configuration
+data:
+  data_path: data/raw/Tomato_Viavi_Brix_model_pulp.csv
+  target_column: Brix
+  transform: snv
+  savgol:
+    enabled: true
+    window_length: 15
+    polyorder: 2
+    deriv: 1
+  remove_outliers: false
+
+# Feature selection configuration
+feature_selection:
+  method: none
+
+# Model configuration
+model:
+  model_type: pls
+  tune_hyperparams: false
+  test_size: 0.2
+  random_state: 42
+  pls_n_components: 10
+
+# Output configuration
+output_dir: models
+results_dir: results
+verbose: false
+
+# MLflow configuration
+mlflow:
+  enabled: true
+  experiment_name: nirs-tomato-brix 

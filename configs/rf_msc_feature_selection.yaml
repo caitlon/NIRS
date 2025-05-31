@@ -1,0 +1,39 @@
+name: rf_msc_vip_feature_selection
+description: Random Forest regression with MSC transformation and VIP feature selection for Brix prediction
+
+# Data configuration
+data:
+  data_path: data/raw/Tomato_Viavi_Brix_model_pulp.csv
+  target_column: Brix
+  transform: msc
+  savgol:
+    enabled: false
+  remove_outliers: true
+
+# Feature selection configuration
+feature_selection:
+  method: vip
+  n_features: 30
+  plot_selection: true
+  vip_n_components: 8
+
+# Model configuration
+model:
+  model_type: rf
+  tune_hyperparams: true
+  test_size: 0.2
+  random_state: 42
+  rf_n_estimators: 200
+  rf_max_depth: 10
+  rf_min_samples_split: 5
+  rf_min_samples_leaf: 2
+
+# Output configuration
+output_dir: models
+results_dir: results
+verbose: true
+
+# MLflow configuration
+mlflow:
+  enabled: true
+  experiment_name: nirs-tomato-brix-feature-selection 
