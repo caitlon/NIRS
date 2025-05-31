@@ -33,15 +33,16 @@ from nirs_tomato.data_processing.feature_selection import (
 from nirs_tomato.modeling.regression_models import (
     train_regression_model,
     evaluate_regression_model,
-    plot_regression_results,
     save_model
+)
+from nirs_tomato.modeling.hyperparameter_tuning import (
+    bayesian_hyperparameter_search
 )
 from nirs_tomato.modeling.tracking import (
     start_run, 
     log_parameters, 
     log_metrics, 
     log_model, 
-    log_figure,
     log_artifact,
     end_run
 )
@@ -204,20 +205,31 @@ def run_single_experiment(config_path: str) -> None:
             
             logger.info(f"After feature selection, X shape: {X.shape}")
             
-            # Plot selected features if requested
-            if config.feature_selection.plot_selection and hasattr(feature_selector, 'plot_selected_wavelengths'):
+            # If feature selection is enabled and plotting is requested, create plot but don't save
+            if config.feature_selection.method != "none" and config.feature_selection.plot_selection and hasattr(feature_selector, 'plot_selected_wavelengths'):
                 logger.info("Plotting selected features")
                 fig = feature_selector.plot_selected_wavelengths()
                 
-                # Save plot
-                os.makedirs(config.results_dir, exist_ok=True)
-                plot_path = os.path.join(
-                    config.results_dir, 
-                    f"{config.name}_selected_features.png"
-                )
-                fig.savefig(plot_path)
+                # Save selected features to CSV
+                selected_features_path = os.path.join(config.results_dir, f"{config.name}_selected_features.csv")
                 
-                # Log plot to MLflow if enabled
+                # Get the selected wavelengths
+                if hasattr(feature_selector, 'selected_features_indices_'):
+                    selected_indices = feature_selector.selected_features_indices_
+                    if hasattr(feature_selector, 'wavelengths') and feature_selector.wavelengths is not None:
+                        selected_wavelengths = [feature_selector.wavelengths[i] for i in selected_indices]
+                    else:
+                        # Use column names from X as wavelengths
+                        selected_wavelengths = [X.columns[i] for i in selected_indices]
+                    
+                    # Save to CSV
+                    pd.DataFrame({
+                        'feature_index': selected_indices,
+                        'wavelength': selected_wavelengths
+                    }).to_csv(selected_features_path, index=False)
+                    logger.info(f"Saved selected features to {selected_features_path}")
+                
+                # Log plot to MLflow if enabled (but don't save to disk)
                 if config.mlflow.enabled:
                     log_figure(fig, f"{config.name}_selected_features.png")
         
@@ -271,17 +283,63 @@ def run_single_experiment(config_path: str) -> None:
         
         if config.model.tune_hyperparams:
             logger.info("Hyperparameter tuning enabled")
-            # Logic for hyperparameter tuning would go here
-            # This is a placeholder - in real implementation would use hyperparameter_search
-        
-        model = train_regression_model(
-            X_train=X_train,
-            y_train=y_train,
-            model_type=config.model.model_type,
-            model_params=model_params,
-            random_state=config.model.random_state,
-            verbose=config.verbose
-        )
+            
+            # Use Bayesian optimization for hyperparameter tuning
+            n_trials = 30  # Default
+            cv_folds = 3   # Default
+            
+            # Try to get custom values from config if available
+            if hasattr(config.model, 'n_trials'):
+                n_trials = config.model.n_trials
+            if hasattr(config.model, 'cv_folds'):
+                cv_folds = config.model.cv_folds
+                
+            model, search_results = bayesian_hyperparameter_search(
+                X_train=X_train,
+                y_train=y_train,
+                X_val=X_test,
+                y_val=y_test,
+                model_type=config.model.model_type,
+                n_trials=n_trials,
+                cv=cv_folds,
+                scoring='neg_root_mean_squared_error',
+                random_state=config.model.random_state,
+                verbose=config.verbose
+            )
+            
+            # Log best hyperparameters
+            logger.info("Best hyperparameters found:")
+            for param, value in search_results['best_params'].items():
+                logger.info(f"  {param}: {value}")
+                
+            # Save hyperparameter optimization results to CSV
+            hp_results_path = os.path.join(config.results_dir, f"{config.name}_hp_optimization.csv")
+            
+            # Convert trials to DataFrame
+            trials_df = pd.DataFrame([
+                {
+                    **{'trial_number': t.number, 'value': t.value, 'state': t.state.name},
+                    **t.params
+                }
+                for t in search_results['study'].trials
+            ])
+            
+            # Save to CSV
+            trials_df.to_csv(hp_results_path, index=False)
+            logger.info(f"Saved hyperparameter optimization results to {hp_results_path}")
+            
+            # Log as artifact if MLflow enabled
+            if config.mlflow.enabled:
+                log_artifact(hp_results_path)
+        else:
+            model = train_regression_model(
+                X_train=X_train,
+                y_train=y_train,
+                model_type=config.model.model_type,
+                model_params=model_params,
+                random_state=config.model.random_state,
+                verbose=config.verbose
+            )
         
         # Evaluate model
         logger.info("Evaluating model")
@@ -304,16 +362,32 @@ def run_single_experiment(config_path: str) -> None:
         
         # Create regression plot
         logger.info("Creating regression plot")
-        fig = plot_regression_results(
-            y_true=y_test,
-            y_pred=evaluation['val_predictions'],
-            title=f"{config.name} - Test Set"
-        )
         
-        # Save plot
+        # Save results to CSV
         os.makedirs(config.results_dir, exist_ok=True)
-        plot_path = os.path.join(config.results_dir, f"{config.name}_regression_plot.png")
-        fig.savefig(plot_path)
+        results_path = os.path.join(config.results_dir, f"{config.name}_results.csv")
+        
+        # Create DataFrame with actual and predicted values
+        results_df = pd.DataFrame({
+            'actual': y_test,
+            'predicted': evaluation['y_val_pred'],
+            'error': y_test - evaluation['y_val_pred']
+        })
+        
+        # Add metrics as metadata at the top of the file
+        with open(results_path, 'w') as f:
+            f.write("# Results for experiment: {}\n".format(config.name))
+            f.write("# Train metrics:\n")
+            for metric, value in evaluation['train_metrics'].items():
+                f.write("#   {}: {:.4f}\n".format(metric, value))
+            f.write("# Validation metrics:\n")
+            for metric, value in evaluation['val_metrics'].items():
+                f.write("#   {}: {:.4f}\n".format(metric, value))
+            f.write("\n")
+        
+        # Append the DataFrame to the file
+        results_df.to_csv(results_path, mode='a', index=True)
+        logger.info(f"Saved results to {results_path}")
         
         # Save model
         os.makedirs(config.output_dir, exist_ok=True)
@@ -348,15 +422,12 @@ def run_single_experiment(config_path: str) -> None:
             for metric, value in evaluation['val_metrics'].items():
                 log_metrics({f"val_{metric}": value})
             
-            # Log figure
-            log_figure(fig, f"{config.name}_regression_plot.png")
-            
             # Log model
             log_model(model, config.name)
             
             # Log artifacts
             log_artifact(model_path)
-            log_artifact(plot_path)
+            log_artifact(results_path)
             
             # End the run
             end_run()
