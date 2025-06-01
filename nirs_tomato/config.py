@@ -225,6 +225,31 @@ class ExperimentConfig(BaseModel):
         with open(yaml_path, 'r') as file:
             config_dict = yaml.safe_load(file)
         
+        # Convert string values to corresponding Enum types
+        if 'data' in config_dict and 'transform' in config_dict['data']:
+            transform_value = config_dict['data']['transform']
+            if isinstance(transform_value, str):
+                try:
+                    config_dict['data']['transform'] = TransformType(transform_value)
+                except ValueError:
+                    pass  # Leave as is if conversion fails
+        
+        if 'feature_selection' in config_dict and 'method' in config_dict['feature_selection']:
+            method_value = config_dict['feature_selection']['method']
+            if isinstance(method_value, str):
+                try:
+                    config_dict['feature_selection']['method'] = FeatureSelectionMethod(method_value)
+                except ValueError:
+                    pass
+        
+        if 'model' in config_dict and 'model_type' in config_dict['model']:
+            model_type_value = config_dict['model']['model_type']
+            if isinstance(model_type_value, str):
+                try:
+                    config_dict['model']['model_type'] = ModelType(model_type_value)
+                except ValueError:
+                    pass
+        
         return cls(**config_dict)
     
     def to_yaml(self, yaml_path: str) -> None:
@@ -237,8 +262,21 @@ class ExperimentConfig(BaseModel):
         # Ensure directory exists
         os.makedirs(os.path.dirname(os.path.abspath(yaml_path)), exist_ok=True)
         
+        # Convert Enum values to strings for proper YAML serialization
+        config_dict = self.model_dump()
+        
+        # Convert Enum values to strings
+        if 'data' in config_dict and 'transform' in config_dict['data']:
+            config_dict['data']['transform'] = str(config_dict['data']['transform'])
+        
+        if 'feature_selection' in config_dict and 'method' in config_dict['feature_selection']:
+            config_dict['feature_selection']['method'] = str(config_dict['feature_selection']['method'])
+        
+        if 'model' in config_dict and 'model_type' in config_dict['model']:
+            config_dict['model']['model_type'] = str(config_dict['model']['model_type'])
+        
         with open(yaml_path, 'w') as file:
-            yaml.dump(self.model_dump(), file, default_flow_style=False, sort_keys=False)
+            yaml.dump(config_dict, file, default_flow_style=False, sort_keys=False)
     
     def get_experiment_name(self) -> str:
         """
