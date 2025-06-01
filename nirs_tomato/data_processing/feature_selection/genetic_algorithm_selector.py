@@ -284,8 +284,7 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
 
         ax.set_xlabel("Wavelength (nm)")
         ax.set_title(
-            f"Selected Wavelengths (GA): {
-                len(selected_wavelengths)} features")
+            f"Selected Wavelengths (GA): {len(selected_wavelengths)} features")
         ax.set_yticks([])
 
         plt.tight_layout()

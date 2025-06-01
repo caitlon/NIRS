@@ -223,8 +223,7 @@ class OutlierDetector(BaseEstimator, TransformerMixin):
             self.outlier_mask_ = z_outliers | pca_outliers
         else:
             raise ValueError(
-                f"Unknown outlier detection method: {
-                    self.method}")
+                f"Unknown outlier detection method: {self.method}")
 
         return self
 

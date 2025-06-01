@@ -8,6 +8,8 @@ import logging
 import sys
 
 import pytest
+import numpy as np
+import pandas as pd
 
 # Import fixtures so they're available to all tests
 
@@ -33,3 +35,108 @@ def configure_logging():
         root_logger.removeHandler(handler)
 
     yield
+
+
+@pytest.fixture
+def sample_spectra_data():
+    """
+    Create sample NIR spectral data for testing.
+    
+    Returns:
+        pd.DataFrame: DataFrame with spectral data (X), only spectral columns without metadata
+    """
+    # Create synthetic wavelengths (e.g., 900-1700 nm with 5nm intervals)
+    wavelengths = np.arange(900, 1705, 5)
+    n_wavelengths = len(wavelengths)
+    
+    # Create sample column names for the spectra
+    column_names = [f"wl_{w}" for w in wavelengths]
+    
+    # Create 30 synthetic spectra with random variations
+    n_samples = 30
+    np.random.seed(42)  # For reproducibility
+    
+    # Base spectrum shape (similar to NIR spectra of organic materials)
+    base_spectrum = np.sin(np.linspace(0, 3 * np.pi, n_wavelengths)) + 2
+    
+    # Add random variations to create multiple samples
+    spectra = np.array([
+        base_spectrum + 0.2 * np.random.randn(n_wavelengths) 
+        for _ in range(n_samples)
+    ])
+    
+    # Create DataFrame with spectra only - no metadata columns
+    X = pd.DataFrame(spectra, columns=column_names)
+    
+    return X
+
+
+@pytest.fixture
+def sample_spectra_data_with_metadata():
+    """
+    Create sample NIR spectral data with metadata for testing.
+    
+    Returns:
+        pd.DataFrame: DataFrame with spectral data and metadata columns
+    """
+    # Get the base spectral data
+    X = sample_spectra_data()
+    
+    # Add some non-spectral columns
+    X['sample_id'] = [f'S{i:03d}' for i in range(len(X))]
+    X['batch'] = np.random.choice(['A', 'B', 'C'], size=len(X))
+    
+    return X
+
+
+@pytest.fixture
+def sample_target_data():
+    """
+    Create sample target values for testing.
+    
+    Returns:
+        pd.Series: Series with target values (y)
+    """
+    # Create 30 synthetic spectra with random variations
+    n_samples = 30
+    np.random.seed(42)  # For reproducibility
+    
+    # Create synthetic target values (e.g., Brix values for tomatoes)
+    y = pd.Series(
+        3.5 + 0.5 * np.random.randn(n_samples),
+        name='brix'
+    )
+    
+    return y
+
+
+@pytest.fixture
+def train_test_split_indices():
+    """
+    Create indices for train/test/validation split.
+    
+    Returns:
+        dict: Dictionary with train, test, and validation indices
+    """
+    np.random.seed(42)
+    
+    # Total number of samples
+    n_samples = 30
+    
+    # Generate indices and shuffle them
+    indices = np.arange(n_samples)
+    np.random.shuffle(indices)
+    
+    # Split indices into train (70%), validation (15%), and test (15%)
+    train_size = int(0.7 * n_samples)
+    val_size = int(0.15 * n_samples)
+    
+    train_indices = indices[:train_size]
+    val_indices = indices[train_size:train_size + val_size]
+    test_indices = indices[train_size + val_size:]
+    
+    return {
+        'train': train_indices,
+        'val': val_indices,
+        'test': test_indices
+    }

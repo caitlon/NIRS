@@ -344,8 +344,7 @@ def hyperparameter_search(
 
     # Run search
     if verbose:
-        logger.info(f"Starting hyperparameter search for {
-            model_type.upper()} with {n_iter} iterations...")
+        logger.info(f"Starting hyperparameter search for {model_type.upper()} with {n_iter} iterations...")
 
     start_time = time.time()
     search.fit(X_train, y_train)
@@ -354,8 +353,7 @@ def hyperparameter_search(
     if verbose:
         search_time = end_time - start_time
         logger.info(
-            f"Hyperparameter search completed in {
-                search_time:.2f} seconds")
+            f"Hyperparameter search completed in {search_time:.2f} seconds")
         logger.info(f"Best parameters: {search.best_params_}")
         logger.info(f"Best score: {search.best_score_:.4f}")
 
