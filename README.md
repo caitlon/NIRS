@@ -5,6 +5,8 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![MLflow](https://img.shields.io/badge/MLflow-2.11%2B-brightgreen)](https://mlflow.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Tests](https://github.com/your-username/NIRS/actions/workflows/tests.yml/badge.svg)](https://github.com/your-username/NIRS/actions/workflows/tests.yml)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <p align="center">
   <img src="images/tomato.png" alt="Tomato NIR Spectroscopy" width="600">
@@ -24,7 +26,10 @@
   - [Setup and Installation](#setup-and-installation)
   - [Running Experiments with MLflow](#running-experiments-with-mlflow)
   - [Viewing Results via MLflow UI](#viewing-results-via-mlflow-ui)
-  - [Programmatic Usage of MLflow API](#programmatic-usage-of-mlflow-api)
+- [🧪 Testing](#-testing)
+  - [Running Tests](#running-tests)
+  - [Continuous Integration](#continuous-integration)
+- [📝 License](#-license)
 
 ## ✨ Features
 
@@ -43,8 +48,7 @@
 
 - 📊 **Advanced model optimization**:
   - Hyperparameter tuning with Optuna
-  - Feature selection methods
-  - Genetic algorithm optimization
+  - Feature selection methods (Genetic Algorithm, CARS, VIP)
   - Integrated cross-validation
 
 - 📈 **Experiment tracking with MLflow**:
@@ -52,6 +56,11 @@
   - Metrics tracking
   - Model artifacts storage
   - Feature importance visualization
+
+- 🧪 **Quality assurance**:
+  - Comprehensive test suite
+  - CI/CD with GitHub Actions
+  - Code quality checks with black, isort, flake8, and mypy
 
 ## 📂 Project Structure
 
@@ -61,7 +70,8 @@ NIRS/
 │   ├── pls_snv_savgol.yaml     # PLS model with SNV and Savitzky-Golay
 │   ├── rf_msc_feature_selection.yaml # Random Forest with feature selection
 │   ├── xgb_genetic_algorithm.yaml    # XGBoost with genetic algorithm
-│   └── ...                     # Other configuration files
+│   ├── rf_hyperparams_tuning.yaml    # Random Forest with hyperparameter tuning
+│   └── README.md               # Documentation for config files
 ├── data/                       # Data directory
 │   ├── raw/                    # Raw input data files
 │   └── processed/              # Processed data files
@@ -73,7 +83,7 @@ NIRS/
 │   ├── process_tomato_data.py  # Tomato-specific data processing
 │   ├── run_experiment.py       # Main experiment runner
 │   ├── run_from_config.py      # Run experiments from config files
-│   ├── run_experiments.py      # Legacy experiment runner
+│   ├── run_experiments.py      # Extended experiment runner
 │   ├── run_mlflow_server.py    # MLflow server launcher
 │   └── train_model.py          # Model training script
 ├── images/                     # Images for documentation
@@ -98,6 +108,9 @@ NIRS/
 │   └── __init__.py             # Package initialization
 ├── results/                    # Experiment results and outputs
 ├── tests/                      # Test files
+│   ├── conftest.py             # Test fixtures and configuration
+│   ├── test_data_processing/   # Tests for data processing
+│   └── test_modeling/          # Tests for modeling
 ├── docs/                       # Documentation
 ├── .gitignore                  # Git ignore file
 ├── .coverage                   # Coverage report
@@ -116,6 +129,49 @@ pip install -e ".[dev]"
 ```
 
 ## 📊 Usage
+
+### Quick Start
+
+Here's a quick example to get you started with analyzing tomato NIR spectra:
+
+```python
+from nirs_tomato.data_processing.transformers import SNVTransformer
+from nirs_tomato.data_processing.utils import preprocess_spectra
+from nirs_tomato.modeling.model_factory import create_model
+from nirs_tomato.modeling.evaluation import evaluate_regression_model
+import pandas as pd
+from sklearn.model_selection import train_test_split
+
+# 1. Load your NIR data
+df = pd.read_csv('data/raw/Tomato_Viavi_Brix_model_pulp.csv')
+
+# 2. Process the spectral data
+results = preprocess_spectra(
+    df=df,
+    target_column='Brix',
+    transformers=[SNVTransformer()],
+    exclude_columns=['Instrument Serial Number', 'Notes', 'Timestamp'],
+    remove_outliers=True,
+    verbose=True
+)
+
+# 3. Get processed features and target
+X, y = results['X'], results['y']
+
+# 4. Split data for training and testing
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# 5. Create and train a model
+model = create_model(model_type="pls", n_components=10)
+model.fit(X_train, y_train)
+
+# 6. Evaluate the model
+metrics, y_pred = evaluate_regression_model(model, X_test, y_test)
+print(f"Model performance:")
+print(f"  R² score: {metrics['r2']:.4f}")
+print(f"  RMSE: {metrics['rmse']:.4f}")
+print(f"  MAE: {metrics['mae']:.4f}")
+```
 
 ### Data Processing
 
@@ -179,7 +235,7 @@ model.fit(X_train, y_train)
 
 # Evaluate model
 metrics, y_pred = evaluate_regression_model(model, X_test, y_test)
-print(f"R2 score: {metrics['r2_score']:.4f}")
+print(f"R2 score: {metrics['r2']:.4f}")
 ```
 
 ### Running Experiments
@@ -194,131 +250,149 @@ The simplest way to run experiments is using YAML configuration files:
 # Run a single experiment from a config file
 python experiments/run_experiment.py --config configs/pls_snv_savgol.yaml
 
-# Run all experiments in a directory
+# Run all experiments in the configs directory
 python experiments/run_experiment.py --config_dir configs/
+
+# Run an experiment with verbose output
+python experiments/run_experiment.py --config configs/rf_msc_feature_selection.yaml --verbose
 ```
 
-You can create new configuration templates easily:
+#### 2. Creating Custom Configuration Files
+
+You can create your own experiment configuration files using the `create_config.py` script:
 
 ```bash
-# Create a new experiment configuration
-python experiments/create_config.py --name my_pls_experiment --model pls --output configs/my_pls_experiment.yaml
+# Create a new configuration file
+python experiments/create_config.py --name my_experiment --data_path data/raw/Tomato_Viavi_Brix_model_pulp.csv --target_column Brix --model rf --transform snv --output configs/my_experiment.yaml
 ```
 
-Example configuration file:
-
-```yaml
-# configs/pls_snv_savgol.yaml
-experiment:
-  name: PLS_SNV_SavGol
-  description: PLS model with SNV and Savitzky-Golay filtering
-  data:
-    file_path: data/raw/Tomato_Viavi_Brix_model_pulp.csv
-    target_column: Brix
-    exclude_columns:
-      - Instrument Serial Number
-      - Notes
-      - Timestamp
-  preprocessing:
-    transform: snv
-    savgol:
-      window_length: 15
-      polyorder: 2
-  model:
-    type: pls
-    n_components: 10
-  evaluation:
-    test_size: 0.2
-    random_state: 42
-    cv_folds: 5
-  mlflow:
-    enabled: true
-```
-
-#### 2. Using the Experiment Manager in Python
+#### 3. Programmatic Interface
 
 You can also run experiments programmatically:
 
 ```python
-from experiments.experiment_manager import run_experiment
+from experiments.experiment_manager import ExperimentManager
+from nirs_tomato.config import ExperimentConfig
 
-# Run a single experiment
-results = run_experiment("configs/pls_snv_savgol.yaml")
-print(f"R2 score: {results['metrics']['r2_score']:.4f}")
+# Create experiment manager
+manager = ExperimentManager()
+
+# Run from config file
+results = manager.run_from_config("configs/pls_snv_savgol.yaml")
+
+# Or create a config object programmatically
+config = ExperimentConfig.from_yaml("configs/pls_snv_savgol.yaml")
+config.model.model_type = "rf"  # Change model type
+config.data.transform = "msc"   # Change transformation
+
+# Run with modified config
+results = manager.run_from_config_object(config)
 ```
 
-#### 3. Using the Legacy Script
+### Data Visualization
 
-The package also maintains the original script for backward compatibility:
+The package includes functions for visualizing results:
 
-```bash
-# Run a standard set of experiments
-python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv
+```python
+from nirs_tomato.modeling.regression_models import plot_regression_results
 
-# Run experiments with feature selection methods
-python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --feature_selection
+# Plot regression results
+fig = plot_regression_results(y_test, y_pred, title="Predicted vs Actual Brix")
 
-# Track experiments with MLflow
-python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --use_mlflow
+# Save the plot
+fig.savefig("results/regression_plot.png")
 ```
 
 ## 📈 Experiment Tracking with MLflow
 
-The project integrates MLflow for experiment tracking, allowing you to monitor and compare model performance, hyperparameters, and feature importance.
+The package integrates with MLflow for experiment tracking, which helps you organize and compare your experiments.
 
 ### Setup and Installation
 
-MLflow is already added to dependencies in `pyproject.toml`, so you just need to update the dependencies:
+MLflow is included in the project dependencies. To start the MLflow tracking server:
 
 ```bash
-pip install -e ".[dev]"
+# Start MLflow server with local storage
+python experiments/run_mlflow_server.py --host 0.0.0.0 --port 5000
+
+# Start with custom backend store
+python experiments/run_mlflow_server.py --backend-store-uri sqlite:///mlflow.db
+
+# Start with S3 artifact storage
+python experiments/run_mlflow_server.py --artifacts-uri s3://my-bucket/mlflow-artifacts --endpoint-url http://localhost:9000
 ```
 
 ### Running Experiments with MLflow
 
-To track experiments through MLflow, you can use the `run_experiment.py` script with a configuration that has MLflow enabled:
+To enable MLflow tracking in your experiments, set `mlflow.enabled: true` in your configuration file:
 
-```bash
-# Run experiment with MLflow tracking
-python experiments/run_experiment.py --config configs/pls_snv_savgol.yaml
+```yaml
+# In your YAML config file
+mlflow:
+  enabled: true
+  experiment_name: nirs-tomato-brix
 ```
 
-Or use the legacy script:
-
-```bash
-# Run experiments with MLflow tracking
-python experiments/run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --use_mlflow
-```
-
-### Viewing Results via MLflow UI
-
-To launch a local MLflow server with interface:
-
-```bash
-python experiments/run_mlflow_server.py --host 127.0.0.1 --port 5000
-```
-
-Then open in browser: http://127.0.0.1:5000
-
-### Programmatic Usage of MLflow API
-
-The project includes a module `nirs_tomato.modeling.tracking` with functions for working with MLflow:
+Or enable it programmatically:
 
 ```python
 from nirs_tomato.modeling.tracking import start_run, log_parameters, log_metrics, log_model, end_run
 
-# Start a new experiment
-start_run(run_name="experiment_name")
-
-# Log parameters
-log_parameters({"param1": value1, "param2": value2})
-
-# Log metrics
-log_metrics({"rmse": 0.123, "mae": 0.089, "r2": 0.95})
-
-# Log model
-log_model(trained_model, "model")
-
-# End experiment
-end_run()
+# Start a run
+with start_run(experiment_name="nirs-tomato-test"):
+    # Log parameters
+    log_parameters({"model_type": "pls", "n_components": 10})
+    
+    # Train your model
+    # ...
+    
+    # Log metrics
+    log_metrics({"r2": 0.95, "rmse": 0.05})
+    
+    # Log model
+    log_model(model, "pls_model")
 ```
+
+### Viewing Results via MLflow UI
+
+Once your MLflow server is running, you can view your experiments in the MLflow UI:
+
+1. Open your browser and navigate to `http://localhost:5000` (or your custom host:port)
+2. Browse experiments by name
+3. Compare runs, view metrics, and download models
+
+## 🧪 Testing
+
+### Running Tests
+
+Run the test suite using pytest:
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage report
+pytest --cov=nirs_tomato
+
+# Run specific test module
+pytest tests/test_data_processing/test_transformers.py
+```
+
+### Continuous Integration
+
+This project uses GitHub Actions for continuous integration. The CI pipeline:
+
+1. Runs on multiple Python versions (3.9, 3.10, 3.11)
+2. Installs dependencies
+3. Runs the test suite
+4. Generates and uploads coverage reports
+
+## 📝 License
+
+This project is licensed under the MIT License. See the LICENSE file for details.
+
+---
+
+<p align="center">
+  <i>Built with ❤️ for tomato quality analysis using NIR spectroscopy</i>
+</p>
