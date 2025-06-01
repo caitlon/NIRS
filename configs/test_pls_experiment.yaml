@@ -1,0 +1,61 @@
+name: test_pls_experiment
+description: PLS regression with SNV transformation without feature selection for
+  Brix prediction
+output_dir: models
+results_dir: results
+verbose: false
+data:
+  data_path: data/raw/Tomato_Viavi_Brix_model_pulp.csv
+  target_column: Brix
+  exclude_columns:
+  - Instrument Serial Number
+  - Notes
+  - Timestamp
+  - Integration Time
+  - wetlab ID
+  - Lab
+  transform: snv
+  savgol:
+    enabled: true
+    window_length: 15
+    polyorder: 2
+    deriv: 0
+  remove_outliers: false
+feature_selection:
+  method: none
+  n_features: 0
+  plot_selection: false
+  ga_population_size: 50
+  ga_n_generations: 20
+  ga_crossover_prob: 0.5
+  ga_mutation_prob: 0.2
+  cars_n_sampling_runs: 50
+  cars_exponential_decay: 0.95
+  vip_n_components: 10
+model:
+  model_type: pls
+  tune_hyperparams: false
+  test_size: 0.2
+  random_state: 42
+  pls_n_components: 10
+  svr_kernel: rbf
+  svr_C: 1.0
+  svr_epsilon: 0.1
+  svr_gamma: scale
+  rf_n_estimators: 100
+  rf_max_depth: null
+  rf_min_samples_split: 2
+  rf_min_samples_leaf: 1
+  xgb_n_estimators: 100
+  xgb_learning_rate: 0.1
+  xgb_max_depth: 3
+  xgb_subsample: 0.8
+  xgb_colsample_bytree: 0.8
+  lgbm_n_estimators: 100
+  lgbm_learning_rate: 0.1
+  lgbm_max_depth: -1
+  lgbm_num_leaves: 31
+mlflow:
+  enabled: true
+  tracking_uri: null
+  experiment_name: nirs-tomato-experiments
