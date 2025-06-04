@@ -12,9 +12,9 @@ Usage:
 If no files are specified, it will scan all Python files in the current directory.
 """
 
+from pathlib import Path
 import re
 import sys
-from pathlib import Path
 
 def fix_multiline_fstrings(file_path):
     """Fix multiline f-strings in a Python file."""
