@@ -1,5 +1,8 @@
 name: Auto-format
 
+permissions:
+  contents: write
+
 on:
   push:
     branches: [ main, master ]
@@ -9,12 +12,12 @@ jobs:
   format:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v3
       with:
         fetch-depth: 0
     
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v4
       with:
         python-version: '3.10'
         cache: 'pip'
