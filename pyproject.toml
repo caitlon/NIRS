@@ -56,6 +56,7 @@ dev = [
     "pre-commit>=2.15",
     "jupyter>=1.0.0",
     "ipykernel>=6.0.0",
+    "ruff>=0.5.0",
 ]
 
 [project.urls]
@@ -67,8 +68,56 @@ dev = [
 where = ["."]
 include = ["nirs_tomato*"]
 
+[tool.ruff]
+line-length = 79
+indent-width = 4
+target-version = "py39"
+
+# Exclude a variety of commonly ignored directories.
+exclude = [
+    ".bzr",
+    ".direnv",
+    ".eggs",
+    ".git",
+    ".git-rewrite",
+    ".hg",
+    ".mypy_cache",
+    ".nox",
+    ".pants.d",
+    ".pytype",
+    ".ruff_cache",
+    ".svn",
+    ".tox",
+    ".venv",
+    "__pypackages__",
+    "_build",
+    "buck-out",
+    "build",
+    "dist",
+    "node_modules",
+    "venv",
+]
+
+[tool.ruff.lint]
+# Enable flake8-bugbear (`B`) rules.
+select = ["E", "F", "B", "I"]
+ignore = ["E402", "E203", "E501"]
+
+# Allow unused variables when underscore-prefixed.
+dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"
+
+[tool.ruff.format]
+# Like Black, use double quotes for strings.
+quote-style = "double"
+# Like Black, indent with spaces, rather than tabs.
+indent-style = "space"
+# Like Black, respect magic trailing commas.
+skip-magic-trailing-comma = false
+# Like Black, automatically detect the appropriate line ending.
+line-ending = "auto"
+
 [tool.black]
-line-length = 88
+line-length = 79
 target-version = ['py38']
 include = '\.pyi?$'
 exclude = '''
@@ -89,7 +138,7 @@ exclude = '''
 [tool.isort]
 profile = "black"
 multi_line_output = 3
-line_length = 88
+line_length = 79
 known_first_party = ["nirs_tomato"]
 
 [tool.pytest.ini_options]
