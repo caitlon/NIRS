@@ -255,7 +255,7 @@ def main():
             mae = row.get("mae", np.nan)
 
             logger.info(
-                f"{row['model_name']:<30} {rmse:<10.4f} {r2:<10.4f} {mae:<10.4f}"  
+                f"{row['model_name']:<30} {rmse:<10.4f} {r2:<10.4f} {mae:<10.4f}"
             )
 
         # Find best model

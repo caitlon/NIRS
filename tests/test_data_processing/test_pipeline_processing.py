@@ -34,7 +34,9 @@ def test_identify_spectral_columns():
     spectral_cols, non_spectral_cols = identify_spectral_columns(df)
 
     # Check results
-    assert len(spectral_cols) == 0  # current function only looks for numeric column names
+    assert (
+        len(spectral_cols) == 0
+    )  # current function only looks for numeric column names
     assert "wl_900" not in spectral_cols
     assert "id" in non_spectral_cols
     assert "meta" in non_spectral_cols
@@ -44,8 +46,8 @@ def test_extract_wavelengths():
     """Test extraction of wavelengths from column names."""
     # Create test data instead of calling non-existent function
     columns = ["wl_900", "wl_901", "wl_1000"]
-    wavelengths = [int(col.split('_')[1]) for col in columns]
-    
+    wavelengths = [int(col.split("_")[1]) for col in columns]
+
     assert len(wavelengths) == 3
     assert wavelengths[0] == 900
     assert wavelengths[1] == 901
@@ -56,8 +58,8 @@ def test_spectral_transformations():
     """Test application of spectral transformations."""
     # Create test spectral data
     X = np.random.rand(5, 10)
-    pd.DataFrame(X, columns=[f"{i+900}" for i in range(10)])
-    
+    pd.DataFrame(X, columns=[f"{i + 900}" for i in range(10)])
+
     # Test SNV transformation
     transformer = SNVTransformer()
     X_snv = transformer.fit_transform(X)
@@ -77,7 +79,9 @@ def test_preprocess_spectra():
     """Test full pipeline for processing spectral data."""
     # Create test data
     wavelengths = list(range(900, 1100, 10))
-    spectral_cols = [str(w) for w in wavelengths]  # Use numbers as column names (as in code)
+    spectral_cols = [
+        str(w) for w in wavelengths
+    ]  # Use numbers as column names (as in code)
     n_samples = 10
 
     # Create DataFrame
@@ -94,7 +98,10 @@ def test_preprocess_spectra():
     result = preprocess_spectra(
         df=df,
         target_column="Brix",
-        transformers=[SNVTransformer(), SavGolTransformer(window_length=5, polyorder=2)],
+        transformers=[
+            SNVTransformer(),
+            SavGolTransformer(window_length=5, polyorder=2),
+        ],
         exclude_columns=["ID"],
         remove_outliers=False,
     )
@@ -113,4 +120,6 @@ def test_preprocess_spectra():
     assert "ID" not in result["X"].columns
 
     # Check target column values
-    pd.testing.assert_series_equal(result["y"], df["Brix"].loc[result["X"].index])
+    pd.testing.assert_series_equal(
+        result["y"], df["Brix"].loc[result["X"].index]
+    )

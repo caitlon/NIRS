@@ -45,7 +45,7 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
         Actual wavelength values (for visualization and interpretation).
     random_state : int, optional (default=None)
         Random seed for reproducibility.
-    """  
+    """
 
     def __init__(
         self,
@@ -192,7 +192,7 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
 
         # Limit to n_features_to_select if necessary
         if sum(self.selected_features_mask_) > self.n_features_to_select:
-            # If too many features selected, keep only the top n_features_to_select  
+            # If too many features selected, keep only the top n_features_to_select
             # based on individual feature importance (correlation with target)
             correlations = np.array(
                 [

@@ -12,7 +12,7 @@ from nirs_tomato.data_processing.feature_selection.genetic_algorithm_selector im
 
 
 def test_genetic_algorithm_selector_initialization():
-    """Test Genetic Algorithm selector initialization with various parameters."""  
+    """Test Genetic Algorithm selector initialization with various parameters."""
     # Create a simple estimator
     estimator = LinearRegression()
 

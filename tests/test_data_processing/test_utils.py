@@ -46,15 +46,18 @@ def test_preprocess_spectra(sample_spectra_data):
 def test_preprocess_spectra_with_outlier_removal(sample_spectra_data):
     """Test preprocessing with outlier removal."""
     # Create test with numeric columns instead of wl_*
-    data = pd.DataFrame({
-        str(900+i): np.random.rand(10) for i in range(100)  # 100 spectral columns
-    })
+    data = pd.DataFrame(
+        {
+            str(900 + i): np.random.rand(10)
+            for i in range(100)  # 100 spectral columns
+        }
+    )
     # Add target variable
     data["Brix"] = range(len(data))
-    
+
     # Make first sample an obvious outlier
     data.iloc[0, :50] = data.iloc[0, :50] * 50  # Increase first 50 columns
-    
+
     # Use PCA for outlier detection
     results = preprocess_spectra(
         df=data,
@@ -64,13 +67,13 @@ def test_preprocess_spectra_with_outlier_removal(sample_spectra_data):
         remove_outliers=True,
         outlier_method="pca",
     )
-    
+
     # Check that function worked and returned results
     assert "X" in results
     assert "y" in results
     assert len(results["X"]) > 0
     assert len(results["y"]) > 0
-    
+
     if "outlier_mask" in results:
         # Check that first sample is detected as outlier
         # (but not strictly requiring this, as algorithms may change)
@@ -82,13 +85,13 @@ def test_detect_outliers_zscore():
     # Create data with outlier
     data = np.ones((10, 5))  # All ones
     data[0, 0] = 100  # Add outlier
-    
+
     # The current implementation uses statistical Z-score,
     # which may identify all samples as outliers due to
     # the homogeneity of test data. Creating more varied data.
     varied_data = np.random.rand(20, 5)
     # Add obvious outlier in first row
-    varied_data[0] = varied_data[0] * 20  
+    varied_data[0] = varied_data[0] * 20
 
     outliers = detect_outliers_zscore(
         varied_data,
@@ -105,14 +108,14 @@ def test_detect_outliers_pca():
     # Create data with obvious outlier for PCA
     np.random.seed(42)  # For reproducibility
     data = np.random.rand(20, 5)
-    
+
     # Make first row very different from others
     data[0] = data[0] + 100  # Very large deviation
-    
+
     # Run PCA with different threshold levels
     outliers1 = detect_outliers_pca(data, threshold=5.0, n_components=2)
     detect_outliers_pca(data, threshold=20.0, n_components=2)
-    
+
     # Just check that function returns a mask of right size
     # Not requiring specific result as it depends on algorithm
     assert isinstance(outliers1, np.ndarray)

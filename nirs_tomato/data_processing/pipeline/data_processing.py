@@ -36,19 +36,19 @@ from .preprocessing import create_preprocessing_pipeline
 def get_wavelengths_from_columns(column_names: List[str]) -> List[int]:
     """
     Extract wavelength values from column names.
-    
+
     Args:
         column_names: List of column names like 'wl_900', 'wl_901', etc.
-        
+
     Returns:
         List of extracted wavelength values as integers
     """
     wavelengths = []
     for col in column_names:
         # Try to extract the wavelength number from the column name
-        if col.startswith('wl_'):
+        if col.startswith("wl_"):
             try:
-                wl = int(col.split('_')[1])
+                wl = int(col.split("_")[1])
                 wavelengths.append(wl)
             except (ValueError, IndexError):
                 continue
@@ -56,40 +56,36 @@ def get_wavelengths_from_columns(column_names: List[str]) -> List[int]:
 
 
 def apply_spectral_transformation(
-    X: np.ndarray,
-    transform_method: str = "none",
-    **kwargs: Any
+    X: np.ndarray, transform_method: str = "none", **kwargs: Any
 ) -> np.ndarray:
     """
     Apply spectral transformation to data.
-    
+
     Args:
         X: Spectral data array
         transform_method: Transformation method ('snv', 'msc', 'savgol', 'none')
         **kwargs: Additional arguments for transformers
-        
+
     Returns:
         Transformed spectral data
     """
     if transform_method == "none":
         return X
-        
+
     if transform_method == "snv":
         transformer = SNVTransformer()
     elif transform_method == "msc":
         transformer = MSCTransformer()
     elif transform_method == "savgol":
-        window_length = kwargs.get('window_length', 15)
-        polyorder = kwargs.get('polyorder', 2)
-        deriv = kwargs.get('deriv', 0)
+        window_length = kwargs.get("window_length", 15)
+        polyorder = kwargs.get("polyorder", 2)
+        deriv = kwargs.get("deriv", 0)
         transformer = SavGolTransformer(
-            window_length=window_length, 
-            polyorder=polyorder, 
-            deriv=deriv
+            window_length=window_length, polyorder=polyorder, deriv=deriv
         )
     else:
         raise ValueError(f"Unknown transformation method: {transform_method}")
-    
+
     return transformer.fit_transform(X)
 
 
@@ -108,7 +104,7 @@ def process_spectral_data(
 ) -> Dict[str, Any]:
     """
     Process spectral data with transformations and optional feature selection.
-    
+
     Args:
         data: DataFrame with spectral and non-spectral data
         target_column: Name of target column
@@ -121,82 +117,89 @@ def process_spectral_data(
         feature_selection_method: Method for feature selection ('vip', 'ga', 'cars', 'none')
         n_features: Number of features to select
         verbose: Whether to log processing details
-        
+
     Returns:
         Dictionary with processed data and metadata
     """
     # Configure logging
     logger = logging.getLogger(__name__)
     exclude_columns = exclude_columns or []
-    
+
     # Step 1: Identify spectral columns
     spectral_cols = identify_spectral_columns(data)
-    
+
     # Step 2: Extract wavelengths from column names
     wavelengths = get_wavelengths_from_columns(spectral_cols)
-    
+
     # Step 3: Extract features and target
     X = data[spectral_cols].copy()
     y = data[target_column].copy() if target_column in data.columns else None
-    
+
     # Step 4: Apply spectral transformations
     X_values = X.values
     if transform_method != "none":
         if verbose:
             logger.info(f"Applying {transform_method.upper()} transformation")
         X_transformed = apply_spectral_transformation(
-            X_values, 
-            transform_method=transform_method
+            X_values, transform_method=transform_method
         )
         X = pd.DataFrame(X_transformed, index=X.index, columns=X.columns)
-    
+
     # Step 5: Apply Savitzky-Golay if requested
     if apply_savgol:
         if verbose:
-            logger.info(f"Applying Savitzky-Golay filter (window={window_length}, "
-                       f"polyorder={polyorder}, deriv={deriv})")
+            logger.info(
+                f"Applying Savitzky-Golay filter (window={window_length}, "
+                f"polyorder={polyorder}, deriv={deriv})"
+            )
         X_sg = apply_spectral_transformation(
-            X.values, 
+            X.values,
             transform_method="savgol",
             window_length=window_length,
             polyorder=polyorder,
-            deriv=deriv
+            deriv=deriv,
         )
         X = pd.DataFrame(X_sg, index=X.index, columns=X.columns)
-    
+
     # Step 6: Apply feature selection if requested
     selected_features = []
     if feature_selection_method != "none" and y is not None:
         if verbose:
-            logger.info(f"Applying {feature_selection_method.upper()} feature selection")
-        
+            logger.info(
+                f"Applying {feature_selection_method.upper()} feature selection"
+            )
+
         from ..feature_selection import (
             CARSSelector,
             GeneticAlgorithmSelector,
             PLSVIPSelector,
         )
-        
+
         if feature_selection_method == "vip":
             selector = PLSVIPSelector(n_features_to_select=n_features)
         elif feature_selection_method == "ga":
-            selector = GeneticAlgorithmSelector(n_features_to_select=n_features)
+            selector = GeneticAlgorithmSelector(
+                n_features_to_select=n_features
+            )
         elif feature_selection_method == "cars":
             selector = CARSSelector(n_features_to_select=n_features)
         else:
-            raise ValueError(f"Unknown feature selection method: {feature_selection_method}")
-        
+            raise ValueError(
+                f"Unknown feature selection method: {feature_selection_method}"
+            )
+
         # Fit the selector
         selector.fit(X, y)
-        
+
         # Get selected features
-        if hasattr(selector, 'selected_features_indices_'):
+        if hasattr(selector, "selected_features_indices_"):
             selected_indices = selector.selected_features_indices_
             selected_features = [X.columns[i] for i in selected_indices]
             X = X[selected_features]
-        
+
             if verbose:
                 logger.info(f"Selected {len(selected_features)} features")
-    
+
     # Prepare result
     result = {
         "data": data,
@@ -204,9 +207,9 @@ def process_spectral_data(
         "y": y,
         "wavelengths": wavelengths,
         "spectral_columns": spectral_cols,
-        "selected_features": selected_features
+        "selected_features": selected_features,
     }
-    
+
     return result
 
 

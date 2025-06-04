@@ -5,7 +5,7 @@ This module has been refactored for better modularity.
 The pipeline functions are now located in the pipeline/ directory.
 
 This file is kept for backward compatibility.
-"""  
+"""
 
 from .pipeline.data_preparation import prepare_data_for_regression
 from .pipeline.data_processing import (

@@ -57,7 +57,7 @@ def train_regression_model(
 
     Returns:
         Trained regression model
-    """  
+    """
     # Configure logging
     logger = logging.getLogger(__name__)
     log_level = logging.INFO if verbose else logging.WARNING

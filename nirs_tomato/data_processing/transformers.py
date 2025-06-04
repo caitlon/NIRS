@@ -3,7 +3,7 @@ NIR Preprocessing Transformers Module
 
 This module contains preprocessing transformers for NIR spectral data analysis.
 All transformers follow scikit-learn's BaseEstimator and TransformerMixin interfaces.
-"""  
+"""
 
 from typing import Any, Dict, List, Optional, Union
 
@@ -28,7 +28,7 @@ class SNVTransformer(BaseEstimator, TransformerMixin):
 
     For each spectrum (row), this subtracts the mean and divides by the standard deviation.
     This helps reduce scatter effects and baseline variations.
-    """  
+    """
 
     def __init__(self, spectral_cols: Optional[List[str]] = None):
         self.spectral_cols = spectral_cols
@@ -130,7 +130,7 @@ class MSCTransformer(BaseEstimator, TransformerMixin):
 
     Corrects for scatter effects by regressing each spectrum against a reference
     spectrum (usually the mean) and then correcting using the slope and intercept.
-    """  
+    """
 
     def __init__(self, spectral_cols: Optional[List[str]] = None):
         self.mean_spectrum = None

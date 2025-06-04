@@ -20,9 +20,10 @@ def test_bayesian_hyperparameter_search():
     y = np.random.rand(n_samples)
     y_train = y[:20]
     y_val = y[20:]
-    
+
     # Convert to pandas
     import pandas as pd
+
     X_train = pd.DataFrame(X_train)
     X_val = pd.DataFrame(X_val)
     y_train = pd.Series(y_train)
@@ -46,7 +47,7 @@ def test_bayesian_hyperparameter_search():
     assert "best_params" in search_results
     assert "best_score" in search_results
     assert isinstance(search_results["best_params"], dict)
-    
+
     # Check that model can make predictions
     preds = best_model.predict(X_val)
     assert len(preds) == len(X_val)
@@ -56,26 +57,30 @@ def test_get_hyperparameters_for_trial():
     """Test hyperparameter space definition for different models."""
     # Instead of creating actual trial, use MagicMock
     from unittest.mock import MagicMock
-    
+
     # Test with different model types
     model_types = ["pls", "svr", "rf", "xgb", "lgbm"]
-    
+
     for model_type in model_types:
         # Create mock object
         trial = MagicMock()
-        
+
         # Configure return values for methods
         trial.suggest_int.return_value = 5
         trial.suggest_float.return_value = 0.5
-        trial.suggest_categorical.return_value = "linear" if model_type == "svr" else True
-        
+        trial.suggest_categorical.return_value = (
+            "linear" if model_type == "svr" else True
+        )
+
         # Test hyperparameter generation
-        params = _get_hyperparameters_for_trial(trial, model_type, random_state=42)
-        
+        params = _get_hyperparameters_for_trial(
+            trial, model_type, random_state=42
+        )
+
         # Check that we got valid parameters
         assert isinstance(params, dict)
         assert len(params) > 0
-        
+
         # Check for random_state in models that support it
         if model_type in ["rf", "xgb", "lgbm"]:
             assert "random_state" in params

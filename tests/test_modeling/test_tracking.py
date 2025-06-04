@@ -37,7 +37,9 @@ def test_setup_mlflow(mock_mlflow):
     """Test MLflow setup with new experiment."""
     experiment_id = setup_mlflow(experiment_name="test_experiment")
     assert experiment_id == "test_experiment_id"
-    mock_mlflow.create_experiment.assert_called_once_with(name="test_experiment")
+    mock_mlflow.create_experiment.assert_called_once_with(
+        name="test_experiment"
+    )
 
 
 def test_setup_mlflow_existing(mock_mlflow):

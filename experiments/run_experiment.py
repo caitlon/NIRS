@@ -14,7 +14,7 @@ Examples:
 
     # Run an experiment with verbose output
     python experiments/run_experiment.py --config configs/rf_msc_feature_selection.yaml --verbose
-"""  
+"""
 
 import argparse
 import logging
@@ -32,7 +32,7 @@ from experiments.experiment_manager import ExperimentManager  # noqa: E402
 def main() -> None:
     """Run the experiment based on command line arguments."""
     parser = argparse.ArgumentParser(
-        description="Run NIR spectroscopy experiments using configuration files."  
+        description="Run NIR spectroscopy experiments using configuration files."
     )
 
     group = parser.add_mutually_exclusive_group(required=True)

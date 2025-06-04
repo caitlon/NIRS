@@ -12,7 +12,7 @@ Example:
     # With feature selection:
     $ python process_data.py --input data/raw/tomato_spectra.csv --output data/processed/
                             --transform snv --feature_selection vip --n_features 20
-"""  
+"""
 
 import argparse
 import logging
@@ -112,7 +112,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         choices=["none", "ga", "cars", "vip"],
         default="none",
-        help="Feature selection method to apply (ga=Genetic Algorithm, cars=Competitive Adaptive Reweighted Sampling, vip=Variable Importance in Projection)",  
+        help="Feature selection method to apply (ga=Genetic Algorithm, cars=Competitive Adaptive Reweighted Sampling, vip=Variable Importance in Projection)",
     )
     parser.add_argument(
         "--n_features",
@@ -160,7 +160,7 @@ def main():
 
     if args.savgol:
         logger.info(
-            f"Using Savitzky-Golay filter (window_length={args.window_length}, polyorder={args.polyorder})"  
+            f"Using Savitzky-Golay filter (window_length={args.window_length}, polyorder={args.polyorder})"
         )
         transformers.append(
             SavGolTransformer(
@@ -200,7 +200,7 @@ def main():
     if args.feature_selection != "none":
         if args.target is None or y is None:
             logger.warning(
-                "Feature selection requires a target column. Skipping feature selection."  
+                "Feature selection requires a target column. Skipping feature selection."
             )
         else:
             logger.info(
@@ -251,7 +251,7 @@ def main():
             X = X_selected
 
             logger.info(
-                f"Selected {X.shape[1]} features using {args.feature_selection.upper()}"  
+                f"Selected {X.shape[1]} features using {args.feature_selection.upper()}"
             )
 
             # Plot selected features if requested
@@ -321,7 +321,7 @@ def main():
             "selected_features_mask": feature_selector.selected_features_mask_
             if hasattr(feature_selector, "selected_features_mask_")
             else None,
-            "selected_features_indices": feature_selector.selected_features_indices_  
+            "selected_features_indices": feature_selector.selected_features_indices_
             if hasattr(feature_selector, "selected_features_indices_")
             else None,
         }
@@ -340,12 +340,12 @@ def main():
 
     if args.target and data.get("y") is not None:
         logger.info(
-            f"Processed data contains {len(X)} samples with {X.shape[1]} features"  
+            f"Processed data contains {len(X)} samples with {X.shape[1]} features"
         )
         logger.info(f"Target column: {args.target}")
     else:
         logger.info(
-            f"Processed data contains {len(X)} samples with {X.shape[1]} features (no target specified)"  
+            f"Processed data contains {len(X)} samples with {X.shape[1]} features (no target specified)"
         )
 
     logger.info("Data processing completed successfully")

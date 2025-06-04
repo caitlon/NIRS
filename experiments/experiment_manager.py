@@ -26,7 +26,7 @@ Example:
         model=ModelConfig(model_type="rf")
     )
     manager.run_from_config_object(config)
-"""  
+"""
 
 import logging
 import os
@@ -87,7 +87,7 @@ class ExperimentManager:
 
     This class provides a clean interface for running experiments with different
     configurations, tracking results, and managing experiment lifecycle.
-    """  
+    """
 
     def __init__(self, log_level: int = logging.INFO):
         """
@@ -265,8 +265,8 @@ class ExperimentManager:
 
         if config.data.savgol.enabled:
             self.logger.info(
-                f"Using Savitzky-Golay filter (window_length={config.data.savgol.window_length}, "  
-                f"polyorder={config.data.savgol.polyorder}, deriv={config.data.savgol.deriv})"  
+                f"Using Savitzky-Golay filter (window_length={config.data.savgol.window_length}, "
+                f"polyorder={config.data.savgol.polyorder}, deriv={config.data.savgol.deriv})"
             )
             transformers.append(
                 SavGolTransformer(
@@ -293,7 +293,7 @@ class ExperimentManager:
 
         if y is None or len(y) == 0:
             raise ValueError(
-                f"Target column '{config.data.target_column}' not found or empty after preprocessing"  
+                f"Target column '{config.data.target_column}' not found or empty after preprocessing"
             )
 
         self.logger.info(f"Preprocessed features shape: {X.shape}")
@@ -311,7 +311,7 @@ class ExperimentManager:
         feature_selector = None
         if config.feature_selection.method != "none":
             self.logger.info(
-                f"Using {config.feature_selection.method.upper()} feature selection "  
+                f"Using {config.feature_selection.method.upper()} feature selection "
                 f"with {config.feature_selection.n_features} features"
             )
 

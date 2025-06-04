@@ -14,7 +14,7 @@ Examples:
 
     # Run with MinIO (S3-compatible) storage:
     $ python run_mlflow_server.py --backend-store-uri sqlite:///mlflow.db --artifacts-uri s3://mlflow --endpoint-url http://localhost:9000
-"""  
+"""
 
 import argparse
 import logging
@@ -97,7 +97,7 @@ def setup_s3_env(artifacts_uri, endpoint_url=None):
         "AWS_SECRET_ACCESS_KEY"
     ):
         logger.warning(
-            "AWS_ACCESS_KEY_ID and/or AWS_SECRET_ACCESS_KEY not set in environment. "  
+            "AWS_ACCESS_KEY_ID and/or AWS_SECRET_ACCESS_KEY not set in environment. "
             "Make sure they are set for S3 access to work properly."
         )
 

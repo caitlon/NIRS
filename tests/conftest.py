@@ -55,7 +55,7 @@ def sample_spectra_data():
 
     Returns:
         pd.DataFrame: DataFrame with spectral data (X), only spectral columns without metadata
-    """  
+    """
     # Create synthetic wavelengths (e.g., 900-1700 nm with 5nm intervals)
     wavelengths = np.arange(900, 1705, 5)
     n_wavelengths = len(wavelengths)

@@ -16,7 +16,7 @@ Functions:
 
 These utilities support the transformers and provide core functionality for
 preprocessing NIR tomato spectroscopy datasets before modeling.
-"""  
+"""
 
 import logging
 import re
@@ -372,7 +372,7 @@ def filter_numeric_features(
 
     Returns:
         DataFrame with only numeric columns or explicitly kept columns
-    """  
+    """
     # Configure logging
     logger = logging.getLogger(__name__)
 
@@ -416,7 +416,7 @@ def filter_numeric_features(
         removed_columns = set(initial_columns) - set(df_numeric.columns)
         if removed_columns:
             logger.info(
-                f"Removed {len(removed_columns)} non-numeric columns: {list(removed_columns)}"  
+                f"Removed {len(removed_columns)} non-numeric columns: {list(removed_columns)}"
             )
         logger.info(f"Kept {len(df_numeric.columns)} numeric columns")
 

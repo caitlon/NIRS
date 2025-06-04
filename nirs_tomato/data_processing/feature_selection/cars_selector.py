@@ -41,7 +41,7 @@ class CARSSelector(BaseEstimator, TransformerMixin):
         Actual wavelength values (for visualization and interpretation).
     random_state : int, optional (default=None)
         Random seed for reproducibility.
-    """  
+    """
 
     def __init__(
         self,

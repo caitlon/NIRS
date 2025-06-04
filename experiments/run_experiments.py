@@ -16,7 +16,7 @@ Example:
 
     # With remote MLflow tracking:
     $ python run_experiments.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --use_mlflow --tracking_uri http://server:5000
-"""  
+"""
 
 import argparse
 import logging
@@ -135,7 +135,7 @@ def run_experiment(
 
     Returns:
         Output filename of the trained model
-    """  
+    """
     # Build command
     cmd = [
         "python",
@@ -278,7 +278,7 @@ def run_experiment(
                             # Log hyperparameters
                             if hasattr(model, "get_params"):
                                 hyperparams = model.get_params()
-                                # Add prefix to distinguish from other parameters  
+                                # Add prefix to distinguish from other parameters
                                 hyperparams_with_prefix = {
                                     f"hyperparams.{k}": v
                                     for k, v in hyperparams.items()
@@ -297,7 +297,7 @@ def run_experiment(
                                     if idx < len(feature_names):
                                         log_metrics(
                                             {
-                                                f"feature_importance.{feature_names[idx]}": float(  
+                                                f"feature_importance.{feature_names[idx]}": float(
                                                     feature_importance[idx]
                                                 )
                                             }
@@ -357,7 +357,7 @@ def run_experiment(
                                     "preprocessing": {
                                         "transform_type": transform_type,
                                         "use_savgol": use_savgol,
-                                        "feature_selection_method": feature_selection_method,  
+                                        "feature_selection_method": feature_selection_method,
                                         "n_features": n_features,
                                     },
                                 }
@@ -382,7 +382,7 @@ def run_experiment(
                             # Log hyperparameters
                             if hasattr(model, "get_params"):
                                 hyperparams = model.get_params()
-                                # Add prefix to distinguish from other parameters  
+                                # Add prefix to distinguish from other parameters
                                 hyperparams_with_prefix = {
                                     f"hyperparams.{k}": v
                                     for k, v in hyperparams.items()
@@ -407,7 +407,7 @@ def run_experiment(
             return None
     else:
         logger.error(
-            f"Experiment {experiment_name_str} failed with code {process.returncode}"  
+            f"Experiment {experiment_name_str} failed with code {process.returncode}"
         )
         logger.error(f"Error: {process.stderr}")
         if use_mlflow:
@@ -651,7 +651,7 @@ def main():
 
             results.append(result)
             logger.info(
-                f"Experiment {exp_name} completed, RMSE: {result['rmse']:.4f}, R²: {result['r2']:.4f}"  
+                f"Experiment {exp_name} completed, RMSE: {result['rmse']:.4f}, R²: {result['r2']:.4f}"
             )
         else:
             logger.warning(
@@ -682,7 +682,7 @@ def main():
             sorted_results = results_df.sort_values("rmse")
             for _, row in sorted_results.iterrows():
                 logger.info(
-                    f"{row['experiment']:<25} {row['rmse']:<10.4f} {row['r2']:<10.4f} {row['mae']:<10.4f}"  
+                    f"{row['experiment']:<25} {row['rmse']:<10.4f} {row['r2']:<10.4f} {row['mae']:<10.4f}"
                 )
 
             # Find best model

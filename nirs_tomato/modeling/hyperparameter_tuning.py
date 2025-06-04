@@ -58,7 +58,7 @@ def bayesian_hyperparameter_search(
 
     Returns:
         Tuple of (best_model, search_results)
-    """  
+    """
     # Configure logging
     logger = logging.getLogger(__name__)
     log_level = logging.INFO if verbose else logging.WARNING

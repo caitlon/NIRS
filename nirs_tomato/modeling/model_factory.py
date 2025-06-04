@@ -15,17 +15,25 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 
 
-def create_model(model_type: str, **kwargs) -> Union[PLSRegression, SVR, RandomForestRegressor, xgb.XGBRegressor, lgb.LGBMRegressor]:
+def create_model(
+    model_type: str, **kwargs
+) -> Union[
+    PLSRegression,
+    SVR,
+    RandomForestRegressor,
+    xgb.XGBRegressor,
+    lgb.LGBMRegressor,
+]:
     """
     Create a regression model of specified type with provided parameters.
-    
+
     Args:
         model_type: Type of model to create ('pls', 'svr', 'rf', 'xgb', 'lgbm', 'mlp')
         **kwargs: Parameters to pass to the model constructor
-        
+
     Returns:
         Instantiated regression model
-    
+
     Raises:
         ValueError: If model_type is not recognized
     """
@@ -33,14 +41,14 @@ def create_model(model_type: str, **kwargs) -> Union[PLSRegression, SVR, RandomF
         n_components = kwargs.get("n_components", 10)
         scale = kwargs.get("scale", False)
         return PLSRegression(n_components=n_components, scale=scale)
-    
+
     elif model_type == "svr":
         kernel = kwargs.get("kernel", "rbf")
         C = kwargs.get("C", 1.0)
         gamma = kwargs.get("gamma", "scale")
         epsilon = kwargs.get("epsilon", 0.1)
         return SVR(kernel=kernel, C=C, gamma=gamma, epsilon=epsilon)
-    
+
     elif model_type == "rf":
         n_estimators = kwargs.get("n_estimators", 100)
         max_depth = kwargs.get("max_depth", None)
@@ -52,9 +60,9 @@ def create_model(model_type: str, **kwargs) -> Union[PLSRegression, SVR, RandomF
             max_depth=max_depth,
             min_samples_split=min_samples_split,
             min_samples_leaf=min_samples_leaf,
-            random_state=random_state
+            random_state=random_state,
         )
-    
+
     elif model_type == "xgb":
         n_estimators = kwargs.get("n_estimators", 100)
         learning_rate = kwargs.get("learning_rate", 0.1)
@@ -68,9 +76,9 @@ def create_model(model_type: str, **kwargs) -> Union[PLSRegression, SVR, RandomF
             max_depth=max_depth,
             subsample=subsample,
             colsample_bytree=colsample_bytree,
-            random_state=random_state
+            random_state=random_state,
         )
-        
+
     elif model_type == "lgbm":
         n_estimators = kwargs.get("n_estimators", 100)
         learning_rate = kwargs.get("learning_rate", 0.1)
@@ -82,9 +90,9 @@ def create_model(model_type: str, **kwargs) -> Union[PLSRegression, SVR, RandomF
             learning_rate=learning_rate,
             max_depth=max_depth,
             num_leaves=num_leaves,
-            random_state=random_state
+            random_state=random_state,
         )
-        
+
     elif model_type == "mlp":
         hidden_layer_sizes = kwargs.get("hidden_layer_sizes", (100,))
         activation = kwargs.get("activation", "relu")
@@ -94,9 +102,9 @@ def create_model(model_type: str, **kwargs) -> Union[PLSRegression, SVR, RandomF
             hidden_layer_sizes=hidden_layer_sizes,
             activation=activation,
             solver=solver,
-            random_state=random_state
+            random_state=random_state,
         )
-        
+
     else:
         raise ValueError(f"Unknown model type: {model_type}")
 

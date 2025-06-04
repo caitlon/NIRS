@@ -3,7 +3,7 @@ Variable Importance in Projection (VIP) for PLS Feature Selection in NIR Spectro
 
 This module implements the VIP method for selecting the most informative
 wavelengths from NIR spectral data based on their importance in PLS models.
-"""  
+"""
 
 from typing import List, Optional, Tuple, Union
 

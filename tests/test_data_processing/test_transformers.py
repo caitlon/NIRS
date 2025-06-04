@@ -87,7 +87,7 @@ def test_pca_transformer(sample_spectra_data):
 
 
 def test_transformers_with_subset_columns(sample_spectra_data):
-    """Test transformers when only a subset of columns should be transformed."""  
+    """Test transformers when only a subset of columns should be transformed."""
     # Add a non-spectral column to the data
     data_with_extra = sample_spectra_data.copy()
     data_with_extra["metadata"] = range(len(data_with_extra))

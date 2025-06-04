@@ -15,7 +15,7 @@ Examples:
 
     # Create an XGBoost configuration with feature selection
     python experiments/create_config.py --name xgb_feature_selection --model xgb --feature_selection vip --output configs/xgb_feature_selection.yaml
-"""  
+"""
 
 import argparse
 import os
@@ -77,7 +77,7 @@ def create_config_template(
             if feature_selection == "none"
             else f"with {feature_selection.upper()} feature selection"
         )
-        description = f"{model_type.upper()} regression with {transform_name} transformation {fs_name} for {target_column} prediction"  
+        description = f"{model_type.upper()} regression with {transform_name} transformation {fs_name} for {target_column} prediction"
 
     # Create data configuration
     data_config = DataConfig(
@@ -139,7 +139,7 @@ def create_config_template(
 def main():
     """Parse command line arguments and create configuration template."""
     parser = argparse.ArgumentParser(
-        description="Create a configuration template for NIR spectroscopy experiments."  
+        description="Create a configuration template for NIR spectroscopy experiments."
     )
 
     parser.add_argument(

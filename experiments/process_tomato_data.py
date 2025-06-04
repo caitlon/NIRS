@@ -8,7 +8,7 @@ for later use in modeling.
 Example:
     python process_tomato_data.py --input data/raw/Tomato_Viavi_Brix_model_pulp.csv --output data/processed --method snv
 
-"""  
+"""
 
 import argparse
 import logging
@@ -115,7 +115,7 @@ def main():
 
     # Log arguments
     logger.info(
-        "Processing NIR tomato spectroscopy data with the following parameters:"  
+        "Processing NIR tomato spectroscopy data with the following parameters:"
     )
     logger.info(f"  Input file: {args.input}")
     logger.info(f"  Output directory: {args.output}")

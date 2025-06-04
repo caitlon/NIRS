@@ -136,8 +136,8 @@ def run_single_experiment(config_path: str) -> None:
 
         if config.data.savgol.enabled:
             logger.info(
-                f"Using Savitzky-Golay filter (window_length={config.data.savgol.window_length}, "  
-                f"polyorder={config.data.savgol.polyorder}, deriv={config.data.savgol.deriv})"  
+                f"Using Savitzky-Golay filter (window_length={config.data.savgol.window_length}, "
+                f"polyorder={config.data.savgol.polyorder}, deriv={config.data.savgol.deriv})"
             )
             transformers.append(
                 SavGolTransformer(
@@ -164,7 +164,7 @@ def run_single_experiment(config_path: str) -> None:
 
         if y is None or len(y) == 0:
             raise ValueError(
-                f"Target column '{config.data.target_column}' not found or empty after preprocessing"  
+                f"Target column '{config.data.target_column}' not found or empty after preprocessing"
             )
 
         logger.info(f"Preprocessed features shape: {X.shape}")
@@ -174,7 +174,7 @@ def run_single_experiment(config_path: str) -> None:
         feature_selector = None
         if config.feature_selection.method != "none":
             logger.info(
-                f"Using {config.feature_selection.method.upper()} feature selection "  
+                f"Using {config.feature_selection.method.upper()} feature selection "
                 f"with {config.feature_selection.n_features} features"
             )
 
@@ -213,7 +213,7 @@ def run_single_experiment(config_path: str) -> None:
 
             logger.info(f"After feature selection, X shape: {X.shape}")
 
-            # If feature selection is enabled and plotting is requested, create plot but don't save  
+            # If feature selection is enabled and plotting is requested, create plot but don't save
             if (
                 config.feature_selection.method != "none"
                 and config.feature_selection.plot_selection
@@ -364,7 +364,7 @@ def run_single_experiment(config_path: str) -> None:
             # Save to CSV
             trials_df.to_csv(hp_results_path, index=False)
             logger.info(
-                f"Saved hyperparameter optimization results to {hp_results_path}"  
+                f"Saved hyperparameter optimization results to {hp_results_path}"
             )
 
             # Log as artifact if MLflow enabled

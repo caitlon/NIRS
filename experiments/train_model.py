@@ -13,7 +13,7 @@ Example:
     # With feature selection:
     $ python train_model.py --data data/tomato_spectra.csv --target SSC
                            --model pls --transform snv --feature_selection vip --n_features 20
-"""  
+"""
 
 import argparse
 import logging
@@ -118,7 +118,7 @@ def parse_args() -> argparse.Namespace:
         type=str,
         choices=["none", "ga", "cars", "vip"],
         default="none",
-        help="Feature selection method to apply (ga=Genetic Algorithm, cars=Competitive Adaptive Reweighted Sampling, vip=Variable Importance in Projection)",  
+        help="Feature selection method to apply (ga=Genetic Algorithm, cars=Competitive Adaptive Reweighted Sampling, vip=Variable Importance in Projection)",
     )
     parser.add_argument(
         "--n_features",
@@ -192,7 +192,7 @@ def main():
 
     if args.savgol:
         logger.info(
-            f"Using Savitzky-Golay filter (window_length={args.window_length}, polyorder={args.polyorder})"  
+            f"Using Savitzky-Golay filter (window_length={args.window_length}, polyorder={args.polyorder})"
         )
         transformers.append(
             SavGolTransformer(
@@ -229,7 +229,7 @@ def main():
 
     if y is None or len(y) == 0:
         raise ValueError(
-            f"Target column '{args.target}' not found or empty after preprocessing"  
+            f"Target column '{args.target}' not found or empty after preprocessing"
         )
 
     logger.info(f"Preprocessed features shape: {X.shape}")
@@ -294,7 +294,7 @@ def main():
         X_test = X_test_selected
 
         logger.info(
-            f"Selected {X_train.shape[1]} features using {args.feature_selection.upper()}"  
+            f"Selected {X_train.shape[1]} features using {args.feature_selection.upper()}"
         )
 
         # Plot selected features if requested

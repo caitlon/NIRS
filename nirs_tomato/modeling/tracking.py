@@ -165,7 +165,7 @@ def log_model(
         conda_env: Conda environment specification
         signature: Model signature (input/output schema)
         input_example: Example input for the model
-    """  
+    """
     if not mlflow.active_run():
         logger.warning("No active MLflow run. Model will not be logged.")
         return
@@ -276,7 +276,7 @@ def create_remote_tracking_uri(
 
     Returns:
         Tracking URI string
-    """  
+    """
     if storage_type == "s3":
         if endpoint_url:
             tracking_uri = (

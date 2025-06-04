@@ -2,7 +2,7 @@
 Preprocessing Pipeline Creation Module
 
 This module provides tools to create preprocessing pipelines for NIR tomato spectroscopy data.
-"""  
+"""
 
 from typing import Any, List, Optional, Tuple
 
@@ -32,7 +32,7 @@ def create_preprocessing_pipeline(
 
     Returns:
         Scikit-learn Pipeline for preprocessing
-    """  
+    """
     # Get available pipelines
     preprocessing_pipelines = create_preprocessing_pipelines()
 
