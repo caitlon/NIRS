@@ -70,11 +70,13 @@ def train_regression_model(
     # Create and train the model based on the specified type
     if model_type == "rf":
         # Random Forest
-        default_params = {"n_estimators": 100,
+        default_params = {
+            "n_estimators": 100,
             "max_depth": None,
             "min_samples_split": 2,
             "min_samples_leaf": 1,
-            "random_state": random_state, }
+            "random_state": random_state,
+        }
         # Update with provided parameters
         params = {**default_params, **model_params}
         model = RandomForestRegressor(**params)
@@ -283,10 +285,12 @@ def hyperparameter_search(
     # Set default parameter grid if not provided
     if param_grid is None:
         if model_type == "rf":
-            param_grid = {"n_estimators": [50, 100, 200, 300],
+            param_grid = {
+                "n_estimators": [50, 100, 200, 300],
                 "max_depth": [None, 10, 20, 30],
                 "min_samples_split": [2, 5, 10],
-                "min_samples_leaf": [1, 2, 4], }
+                "min_samples_leaf": [1, 2, 4],
+            }
         elif model_type == "svr":
             param_grid = {
                 "kernel": ["linear", "poly", "rbf"],
