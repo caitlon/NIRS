@@ -40,9 +40,7 @@ def create_preprocessing_pipeline(
     if preprocessing_method not in preprocessing_pipelines:
         valid_methods = list(preprocessing_pipelines.keys())
         raise ValueError(
-            f"Invalid preprocessing method: {
-                preprocessing_method
-            }. Valid options: {valid_methods}"
+            f"Invalid preprocessing method: {preprocessing_method }. Valid options: {valid_methods}"
         )
 
     # Get base pipeline for the selected method

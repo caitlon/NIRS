@@ -15,9 +15,7 @@ from sklearn.neural_network import MLPRegressor
 from sklearn.svm import SVR
 
 
-def create_model(
-    model_type: str, **kwargs
-) -> Union[
+def create_model(model_type: str, **kwargs) -> Union[
     PLSRegression,
     SVR,
     RandomForestRegressor,

@@ -80,9 +80,7 @@ def prepare_data_for_regression(
         ]
         X = X[keep_cols]
         logger.info(
-            f"Keeping {len(spectral_cols)} spectral columns and {
-                len(additional_features)
-            } additional features"
+            f"Keeping {len(spectral_cols)} spectral columns and {len(additional_features)} additional features"
         )
 
     # Split data into train, validation, and test sets

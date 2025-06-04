@@ -198,9 +198,11 @@ def run_experiment(
             "transform_type": transform_type,
             "use_savgol": use_savgol,
             "tune_hyperparams": tune_hyperparams,
-            "feature_selection_method": feature_selection_method
-            if feature_selection_method
-            else "none",
+            "feature_selection_method": (
+                feature_selection_method
+                if feature_selection_method
+                else "none"
+            ),
             "n_features": n_features if feature_selection_method else 0,
         }
         log_parameters(mlflow_params)

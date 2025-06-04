@@ -506,13 +506,11 @@ class ExperimentManager:
                 "gamma": config.model.svr_gamma,
             }
         elif model_type == "rf":
-            params = {
-                "n_estimators": config.model.rf_n_estimators,
+            params = {"n_estimators": config.model.rf_n_estimators,
                 "max_depth": config.model.rf_max_depth,
                 "min_samples_split": config.model.rf_min_samples_split,
                 "min_samples_leaf": config.model.rf_min_samples_leaf,
-                "random_state": config.model.random_state,
-            }
+                "random_state": config.model.random_state, }
         elif model_type == "xgb":
             params = {
                 "n_estimators": config.model.xgb_n_estimators,

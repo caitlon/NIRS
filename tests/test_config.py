@@ -33,7 +33,8 @@ def test_experiment_config_from_yaml(tmp_path):
     # Create temporary YAML file
     config_path = tmp_path / "test_config.yaml"
     with open(config_path, "w") as f:
-        f.write("""
+        f.write(
+            """
 name: yaml_test
 data:
   data_path: data/yaml_test.csv
@@ -42,7 +43,8 @@ data:
 model:
   model_type: pls
   pls_n_components: 5
-        """)
+        """
+        )
 
     # Load configuration
     config = ExperimentConfig.from_yaml(str(config_path))

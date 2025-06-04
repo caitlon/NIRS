@@ -406,9 +406,9 @@ def main():
         "savgol": args.savgol,
         "feature_selection": {
             "method": args.feature_selection,
-            "n_features": args.n_features
-            if args.feature_selection != "none"
-            else None,
+            "n_features": (
+                args.n_features if args.feature_selection != "none" else None
+            ),
             "selector": feature_selector,
         },
         "training_date": timestamp,

@@ -137,9 +137,7 @@ def bayesian_hyperparameter_search(
     start_time = time.time()
     if verbose:
         logger.info(
-            f"Starting Bayesian hyperparameter optimization for {
-                model_type.upper()
-            } model"
+            f"Starting Bayesian hyperparameter optimization for {model_type.upper()} model"
         )
         logger.info(
             f"Running {n_trials} trials with {cv}-fold cross-validation"
@@ -255,8 +253,7 @@ def _get_hyperparameters_for_trial(
         }
 
     elif model_type == "rf":
-        return {
-            "n_estimators": trial.suggest_int("n_estimators", 50, 500),
+        return {"n_estimators": trial.suggest_int("n_estimators", 50, 500),
             "max_depth": (
                 trial.suggest_int("max_depth", 3, 50)
                 if trial.suggest_categorical("limit_depth", [True, False])
@@ -268,8 +265,7 @@ def _get_hyperparameters_for_trial(
                 "max_features", ["sqrt", "log2", None]
             ),
             "bootstrap": trial.suggest_categorical("bootstrap", [True, False]),
-            "random_state": random_state,
-        }
+            "random_state": random_state, }
 
     elif model_type == "xgb":
         return {

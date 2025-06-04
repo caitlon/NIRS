@@ -115,9 +115,7 @@ def remove_duplicate_rows(
         removed_count = len(df) - len(df_cleaned)
         if verbose:
             logger.info(
-                f"Removed {removed_count} duplicate rows. Remaining rows: {
-                    len(df_cleaned)
-                }"
+                f"Removed {removed_count} duplicate rows. Remaining rows: {len(df_cleaned) }"
             )
 
         return df_cleaned
@@ -389,9 +387,7 @@ def filter_numeric_features(
             df_filtered = df_filtered.drop(columns=columns_to_drop)
             if verbose:
                 logger.info(
-                    f"Excluded {len(columns_to_drop)} specified columns: {
-                        columns_to_drop
-                    }"
+                    f"Excluded {len(columns_to_drop)} specified columns: {columns_to_drop }"
                 )
 
     # If keep_columns is specified, keep only those columns

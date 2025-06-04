@@ -285,12 +285,10 @@ def run_single_experiment(config_path: str) -> None:
                 "gamma": config.model.svr_gamma,
             }
         elif config.model.model_type == "rf":
-            model_params = {
-                "n_estimators": config.model.rf_n_estimators,
+            model_params = {"n_estimators": config.model.rf_n_estimators,
                 "max_depth": config.model.rf_max_depth,
                 "min_samples_split": config.model.rf_min_samples_split,
-                "min_samples_leaf": config.model.rf_min_samples_leaf,
-            }
+                "min_samples_leaf": config.model.rf_min_samples_leaf, }
         elif config.model.model_type == "xgb":
             model_params = {
                 "n_estimators": config.model.xgb_n_estimators,

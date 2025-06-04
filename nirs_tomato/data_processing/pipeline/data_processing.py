@@ -355,9 +355,7 @@ def process_and_save_data(
 
     else:
         raise ValueError(
-            f"Invalid save format: {
-                save_format
-            }. Use 'joblib', 'pickle', or 'csv'."
+            f"Invalid save format: {save_format }. Use 'joblib', 'pickle', or 'csv'."
         )
 
     return saved_files
@@ -434,9 +432,7 @@ def load_and_preprocess_data(
     # Identify spectral columns
     spectral_cols, non_spectral_cols = identify_spectral_columns(df)
     logger.info(
-        f"Identified {len(spectral_cols)} spectral columns and {
-            len(non_spectral_cols)
-        } non-spectral columns"
+        f"Identified {len(spectral_cols)} spectral columns and {len(non_spectral_cols) } non-spectral columns"
     )
 
     # Separate target from features
@@ -647,9 +643,7 @@ def preprocess_spectra(
     if non_spectral_numeric_cols:
         if verbose:
             logger.info(
-                f"Adding {
-                    len(non_spectral_numeric_cols)
-                } non-spectral numeric features"
+                f"Adding {len(non_spectral_numeric_cols) } non-spectral numeric features"
             )
         X = pd.concat(
             [X_spectral_df, df_numeric[non_spectral_numeric_cols]], axis=1
@@ -669,9 +663,7 @@ def preprocess_spectra(
         outlier_count = np.sum(outlier_mask)
         if verbose:
             logger.info(
-                f"Detected {outlier_count} outliers using {
-                    outlier_method
-                } method"
+                f"Detected {outlier_count} outliers using {outlier_method } method"
             )
 
         # Remove outliers

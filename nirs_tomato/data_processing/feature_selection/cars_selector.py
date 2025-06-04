@@ -359,9 +359,7 @@ class CARSSelector(BaseEstimator, TransformerMixin):
 
         ax.set_xlabel("Wavelength (nm)")
         ax.set_title(
-            f"Selected Wavelengths (CARS): {
-                len(selected_wavelengths)
-            } features"
+            f"Selected Wavelengths (CARS): {len(selected_wavelengths)} features"
         )
         ax.set_yticks([])
 

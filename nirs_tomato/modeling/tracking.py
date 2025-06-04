@@ -46,9 +46,7 @@ def setup_mlflow(
                 name=experiment_name, artifact_location=artifacts_uri
             )
             logger.info(
-                f"Created new experiment '{
-                    experiment_name
-                }' with artifacts at {artifacts_uri}"
+                f"Created new experiment '{experiment_name}' with artifacts at {artifacts_uri}"
             )
         else:
             experiment_id = mlflow.create_experiment(name=experiment_name)
@@ -56,9 +54,7 @@ def setup_mlflow(
     else:
         experiment_id = experiment.experiment_id
         logger.info(
-            f"Using existing experiment '{experiment_name}' (ID: {
-                experiment_id
-            })"
+            f"Using existing experiment '{experiment_name}' (ID: {experiment_id})"
         )
 
     return experiment_id

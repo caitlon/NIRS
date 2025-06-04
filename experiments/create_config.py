@@ -84,11 +84,11 @@ def create_config_template(
         data_path=data_path,
         target_column=target_column,
         transform=transform,
-        savgol=SavGolConfig(
-            enabled=True, window_length=15, polyorder=2, deriv=0
-        )
-        if transform != "none"
-        else SavGolConfig(enabled=False),
+        savgol=(
+            SavGolConfig(enabled=True, window_length=15, polyorder=2, deriv=0)
+            if transform != "none"
+            else SavGolConfig(enabled=False)
+        ),
     )
 
     # Create feature selection configuration

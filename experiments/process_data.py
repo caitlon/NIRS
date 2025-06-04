@@ -318,12 +318,16 @@ def main():
             "method": args.feature_selection,
             "n_features": args.n_features,
             "selector": feature_selector,
-            "selected_features_mask": feature_selector.selected_features_mask_
-            if hasattr(feature_selector, "selected_features_mask_")
-            else None,
-            "selected_features_indices": feature_selector.selected_features_indices_
-            if hasattr(feature_selector, "selected_features_indices_")
-            else None,
+            "selected_features_mask": (
+                feature_selector.selected_features_mask_
+                if hasattr(feature_selector, "selected_features_mask_")
+                else None
+            ),
+            "selected_features_indices": (
+                feature_selector.selected_features_indices_
+                if hasattr(feature_selector, "selected_features_indices_")
+                else None
+            ),
         }
 
     # Update X in the data dictionary
