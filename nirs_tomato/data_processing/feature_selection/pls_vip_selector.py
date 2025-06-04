@@ -253,7 +253,7 @@ class PLSVIPSelector(BaseEstimator, TransformerMixin):
         )
         ax.set_ylabel("VIP Score")
         ax.set_title(
-            f"PLS VIP Scores (Selected: {np.sum(self.selected_features_mask_) } features)"
+            f"PLS VIP Scores (Selected: {np.sum(self.selected_features_mask_)} features)"
         )
         ax.legend()
 
