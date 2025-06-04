@@ -97,10 +97,10 @@ def test_evaluate_regression_model(
     assert "r2" in val_metrics
 
     # Check that all metrics are floats
-    for metric_name, metric_value in train_metrics.items():
+    for _metric_name, metric_value in train_metrics.items():
         assert isinstance(metric_value, (float, np.float64))
 
-    for metric_name, metric_value in val_metrics.items():
+    for _metric_name, metric_value in val_metrics.items():
         assert isinstance(metric_value, (float, np.float64))
 
 

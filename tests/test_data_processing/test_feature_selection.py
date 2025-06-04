@@ -26,8 +26,9 @@ def test_pls_vip_selector():
 
     # Create and fit the selector
     n_features_to_select = 15
-    selector = PLSVIPSelector(n_components=5,
-                              n_features_to_select=n_features_to_select)
+    selector = PLSVIPSelector(
+        n_components=5, n_features_to_select=n_features_to_select
+    )
     selector.fit(X_df, y_series)
 
     # Check that attributes are set correctly
@@ -53,12 +54,14 @@ def test_pls_vip_selector():
 
 
 def test_pls_vip_selector_with_real_data(
-        sample_spectra_data, sample_target_data):
+    sample_spectra_data, sample_target_data
+):
     """Test PLS VIP selector with our sample spectral data."""
     # Setup
     n_features_to_select = 20
-    selector = PLSVIPSelector(n_components=5,
-                              n_features_to_select=n_features_to_select)
+    selector = PLSVIPSelector(
+        n_components=5, n_features_to_select=n_features_to_select
+    )
 
     # Fit and transform
     selector.fit(sample_spectra_data, sample_target_data)
@@ -67,7 +70,8 @@ def test_pls_vip_selector_with_real_data(
     # Basic checks
     assert X_selected.shape == (
         sample_spectra_data.shape[0],
-        n_features_to_select)
+        n_features_to_select,
+    )
     assert hasattr(selector, "vip_scores_")
     assert len(selector.vip_scores_) == sample_spectra_data.shape[1]
 

@@ -8,7 +8,10 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 from nirs_tomato.data_processing.feature_selection import PLSVIPSelector
-from nirs_tomato.data_processing.transformers import SavGolTransformer, SNVTransformer
+from nirs_tomato.data_processing.transformers import (
+    SavGolTransformer,
+    SNVTransformer,
+)
 
 
 def test_create_basic_pipeline():
@@ -17,7 +20,10 @@ def test_create_basic_pipeline():
     pipeline = Pipeline(
         [
             ("snv", SNVTransformer()),
-            ("savgol", SavGolTransformer(window_length=11, polyorder=2, deriv=1)),
+            (
+                "savgol",
+                SavGolTransformer(window_length=11, polyorder=2, deriv=1),
+            ),
             ("scaler", StandardScaler()),
         ]
     )
@@ -40,13 +46,17 @@ def test_create_basic_pipeline():
 
 
 def test_pipeline_with_feature_selection(
-        sample_spectra_data, sample_target_data):
+    sample_spectra_data, sample_target_data
+):
     """Test pipeline with feature selection component."""
     # Create pipeline with preprocessing and feature selection
     pipeline = Pipeline(
         [
             ("snv", SNVTransformer()),
-            ("savgol", SavGolTransformer(window_length=11, polyorder=2, deriv=1)),
+            (
+                "savgol",
+                SavGolTransformer(window_length=11, polyorder=2, deriv=1),
+            ),
             (
                 "feature_selector",
                 PLSVIPSelector(n_components=3, n_features_to_select=10),

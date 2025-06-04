@@ -31,7 +31,10 @@ def sample_spectra_data() -> pd.DataFrame:
 
     # Add some random variations to each spectrum
     spectra = np.array(
-        [base_spectrum + 0.1 * np.random.randn(n_wavelengths) for _ in range(n_samples)]
+        [
+            base_spectrum + 0.1 * np.random.randn(n_wavelengths)
+            for _ in range(n_samples)
+        ]
     )
 
     # Convert to DataFrame with wavelengths as column names

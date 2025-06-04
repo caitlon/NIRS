@@ -45,10 +45,9 @@ def test_savgol_transformer(sample_spectra_data):
     for i in range(transformed_data.shape[0]):
         row = transformed_data.iloc[i].values
         # The sum of derivatives should be smaller than original data
-        assert abs(
-            np.sum(row)) < abs(
-            np.sum(
-                sample_spectra_data.iloc[i].values))
+        assert abs(np.sum(row)) < abs(
+            np.sum(sample_spectra_data.iloc[i].values)
+        )
 
 
 def test_msc_transformer(sample_spectra_data):
@@ -88,14 +87,15 @@ def test_pca_transformer(sample_spectra_data):
 
 
 def test_transformers_with_subset_columns(sample_spectra_data):
-    """Test transformers when only a subset of columns should be transformed."""
+    """Test transformers when only a subset of columns should be transformed."""  
     # Add a non-spectral column to the data
     data_with_extra = sample_spectra_data.copy()
     data_with_extra["metadata"] = range(len(data_with_extra))
 
     # Get spectral columns
     spectral_cols = [
-        col for col in data_with_extra.columns if col.startswith("wl_")]
+        col for col in data_with_extra.columns if col.startswith("wl_")
+    ]
 
     # Test SNV with subset of columns
     snv = SNVTransformer(spectral_cols=spectral_cols)
