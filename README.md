@@ -5,7 +5,6 @@
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue)](https://www.python.org/)
 [![MLflow](https://img.shields.io/badge/MLflow-2.11%2B-brightgreen)](https://mlflow.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/your-username/NIRS/actions/workflows/tests.yml/badge.svg)](https://github.com/your-username/NIRS/actions/workflows/tests.yml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
 <p align="center">
@@ -59,8 +58,7 @@
 
 - 🧪 **Quality assurance**:
   - Comprehensive test suite
-  - CI/CD with GitHub Actions
-  - Code quality checks with black, isort, flake8, and mypy
+  - Code quality checks with ruff and black
 
 ## 📂 Project Structure
 
@@ -74,6 +72,7 @@ NIRS/
 │   └── README.md               # Documentation for config files
 ├── data/                       # Data directory
 │   ├── raw/                    # Raw input data files
+│   │   └── Tomato_Viavi_Brix_model_pulp.csv # Example tomato NIR spectra dataset
 │   └── processed/              # Processed data files
 ├── experiments/                # Experiment scripts
 │   ├── analyze_models.py       # Script for analyzing model performance
@@ -87,6 +86,7 @@ NIRS/
 │   ├── run_mlflow_server.py    # MLflow server launcher
 │   └── train_model.py          # Model training script
 ├── images/                     # Images for documentation
+│   └── tomato.png              # Visualization of tomato NIR analysis
 ├── mlruns/                     # MLflow experiment tracking data
 ├── models/                     # Saved model files
 ├── nirs_tomato/                # Main package
@@ -94,8 +94,6 @@ NIRS/
 │   ├── data_processing/        # Data processing modules
 │   │   ├── constants.py        # Constant definitions
 │   │   ├── feature_selection.py # Feature selection methods
-│   │   ├── feature_selection/  # Feature selection implementations
-│   │   ├── pipeline.py         # Pipeline definitions
 │   │   ├── pipeline/           # Pipeline implementations
 │   │   ├── transformers.py     # Spectral transformers
 │   │   └── utils.py            # Utility functions
@@ -108,12 +106,10 @@ NIRS/
 │   └── __init__.py             # Package initialization
 ├── results/                    # Experiment results and outputs
 ├── tests/                      # Test files
-│   ├── conftest.py             # Test fixtures and configuration
 │   ├── test_data_processing/   # Tests for data processing
 │   └── test_modeling/          # Tests for modeling
-├── docs/                       # Documentation
 ├── .gitignore                  # Git ignore file
-├── .coverage                   # Coverage report
+├── .flake8                     # Flake8 configuration
 ├── pyproject.toml              # Project configuration
 └── README.md                   # This file
 ```
@@ -123,7 +119,7 @@ NIRS/
 Clone this repository and install the package using pip:
 
 ```bash
-git clone https://github.com/your-username/NIRS.git
+git clone https://github.com/yourusername/NIRS.git
 cd NIRS
 pip install -e ".[dev]"
 ```
@@ -136,7 +132,7 @@ Here's a quick example to get you started with analyzing tomato NIR spectra:
 
 ```python
 from nirs_tomato.data_processing.transformers import SNVTransformer
-from nirs_tomato.data_processing.utils import preprocess_spectra
+from nirs_tomato.data_processing.pipeline.data_processing import preprocess_spectra
 from nirs_tomato.modeling.model_factory import create_model
 from nirs_tomato.modeling.evaluation import evaluate_regression_model
 import pandas as pd
@@ -151,7 +147,7 @@ results = preprocess_spectra(
     target_column='Brix',
     transformers=[SNVTransformer()],
     exclude_columns=['Instrument Serial Number', 'Notes', 'Timestamp'],
-    remove_outliers=True,
+    remove_outliers=False,
     verbose=True
 )
 
@@ -162,7 +158,7 @@ X, y = results['X'], results['y']
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # 5. Create and train a model
-model = create_model(model_type="pls", n_components=10)
+model = create_model("pls", n_components=10)
 model.fit(X_train, y_train)
 
 # 6. Evaluate the model
@@ -179,7 +175,7 @@ The package provides tools for data processing, including transformers for spect
 
 ```python
 from nirs_tomato.data_processing.transformers import SNVTransformer
-from nirs_tomato.data_processing.utils import preprocess_spectra
+from nirs_tomato.data_processing.pipeline.data_processing import preprocess_spectra
 import pandas as pd
 
 # Load data
@@ -191,7 +187,7 @@ results = preprocess_spectra(
     target_column='Brix',
     transformers=[SNVTransformer()],
     exclude_columns=['Instrument Serial Number', 'Notes', 'Timestamp'],
-    remove_outliers=True,
+    remove_outliers=False,
     verbose=True
 )
 
@@ -213,8 +209,8 @@ python experiments/train_model.py --data data/raw/Tomato_Viavi_Brix_model_pulp.c
 # Train an XGBoost model with MSC transformation and Savitzky-Golay filtering
 python experiments/train_model.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --target Brix --model xgb --transform msc --savgol --window_length 15 --polyorder 2 --tune_hyperparams
 
-# Train a Random Forest model excluding specific columns
-python experiments/train_model.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --target Brix --model rf --transform snv --exclude_columns "Notes" "Timestamp" "Instrument Serial Number"
+# Train a Random Forest model with feature selection
+python experiments/train_model.py --data data/raw/Tomato_Viavi_Brix_model_pulp.csv --target Brix --model rf --transform snv --feature_selection vip --n_features 20
 ```
 
 #### Using Python functions
@@ -228,7 +224,7 @@ from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
 # Create model
-model = create_model(model_type="pls")
+model = create_model("pls", n_components=10)
 
 # Train model
 model.fit(X_train, y_train)
@@ -248,13 +244,13 @@ The simplest way to run experiments is using YAML configuration files:
 
 ```bash
 # Run a single experiment from a config file
-python experiments/run_experiment.py --config configs/pls_snv_savgol.yaml
+python experiments/run_from_config.py --config configs/pls_snv_savgol.yaml
 
 # Run all experiments in the configs directory
-python experiments/run_experiment.py --config_dir configs/
+python experiments/run_from_config.py --config_dir configs/
 
 # Run an experiment with verbose output
-python experiments/run_experiment.py --config configs/rf_msc_feature_selection.yaml --verbose
+python experiments/run_from_config.py --config configs/rf_msc_feature_selection.yaml
 ```
 
 #### 2. Creating Custom Configuration Files
@@ -294,13 +290,18 @@ results = manager.run_from_config_object(config)
 The package includes functions for visualizing results:
 
 ```python
-from nirs_tomato.modeling.regression_models import plot_regression_results
+import matplotlib.pyplot as plt
+import numpy as np
 
 # Plot regression results
-fig = plot_regression_results(y_test, y_pred, title="Predicted vs Actual Brix")
-
-# Save the plot
-fig.savefig("results/regression_plot.png")
+plt.figure(figsize=(8, 6))
+plt.scatter(y_test, y_pred, alpha=0.7)
+plt.plot([min(y_test), max(y_test)], [min(y_test), max(y_test)], 'r--')
+plt.xlabel('Actual Brix')
+plt.ylabel('Predicted Brix')
+plt.title('Predicted vs Actual Brix Values')
+plt.tight_layout()
+plt.savefig("results/regression_plot.png")
 ```
 
 ## 📈 Experiment Tracking with MLflow
@@ -317,9 +318,6 @@ python experiments/run_mlflow_server.py --host 0.0.0.0 --port 5000
 
 # Start with custom backend store
 python experiments/run_mlflow_server.py --backend-store-uri sqlite:///mlflow.db
-
-# Start with S3 artifact storage
-python experiments/run_mlflow_server.py --artifacts-uri s3://my-bucket/mlflow-artifacts --endpoint-url http://localhost:9000
 ```
 
 ### Running Experiments with MLflow
@@ -382,17 +380,16 @@ pytest tests/test_data_processing/test_transformers.py
 
 This project uses GitHub Actions for continuous integration. The CI pipeline:
 
-1. Runs on multiple Python versions (3.9, 3.10, 3.11)
-2. Installs dependencies
-3. Runs the test suite
-4. Generates and uploads coverage reports
+1. Runs tests on multiple Python versions
+2. Ensures code quality with ruff and other linters
+3. Generates coverage reports
 
 ## 📝 License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License.
 
 ---
 
 <p align="center">
-  <i>Built with ❤️ for tomato quality analysis using NIR spectroscopy</i>
+  <i>Built for tomato quality analysis using NIR spectroscopy</i>
 </p>
