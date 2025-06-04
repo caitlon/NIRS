@@ -44,13 +44,14 @@ class SavGolConfig(BaseModel):
     """Configuration for Savitzky-Golay filtering."""
 
     enabled: bool = Field(
-        default=True,
-        description="Whether to apply SG filtering")
-    window_length: int = Field(default=15,
-                               description="Window length for SG filter")
+        default=True, description="Whether to apply SG filtering"
+    )
+    window_length: int = Field(
+        default=15, description="Window length for SG filter"
+    )
     polyorder: int = Field(
-        default=2,
-        description="Polynomial order for SG filter")
+        default=2, description="Polynomial order for SG filter"
+    )
     deriv: int = Field(default=0, description="Derivative order")
 
     @field_validator("window_length")
@@ -66,10 +67,11 @@ class FeatureSelectionConfig(BaseModel):
 
     method: FeatureSelectionMethod = Field(
         default=FeatureSelectionMethod.NONE,
-        description="Feature selection method")
+        description="Feature selection method",
+    )
     n_features: int = Field(
-        default=20,
-        description="Number of features to select")
+        default=20, description="Number of features to select"
+    )
     plot_selection: bool = Field(
         default=False, description="Whether to plot selected features"
     )
@@ -77,14 +79,17 @@ class FeatureSelectionConfig(BaseModel):
     # Additional parameters for specific methods
     # Genetic Algorithm
     ga_population_size: int = Field(
-        default=50, description="GA population size")
+        default=50, description="GA population size"
+    )
     ga_n_generations: int = Field(
-        default=20, description="GA number of generations")
+        default=20, description="GA number of generations"
+    )
     ga_crossover_prob: float = Field(
         default=0.5, description="GA crossover probability"
     )
     ga_mutation_prob: float = Field(
-        default=0.2, description="GA mutation probability")
+        default=0.2, description="GA mutation probability"
+    )
 
     # CARS
     cars_n_sampling_runs: int = Field(
@@ -113,50 +118,62 @@ class ModelConfig(BaseModel):
         default=0.2,
         description="Proportion of data to use for testing",
         ge=0.1,
-        le=0.5)
-    random_state: int = Field(default=42,
-                              description="Random seed for reproducibility")
+        le=0.5,
+    )
+    random_state: int = Field(
+        default=42, description="Random seed for reproducibility"
+    )
 
     # Model-specific parameters
     # PLS
     pls_n_components: int = Field(
-        default=10, description="PLS number of components")
+        default=10, description="PLS number of components"
+    )
 
     # SVR
     svr_kernel: str = Field(default="rbf", description="SVR kernel")
     svr_C: float = Field(
-        default=1.0,
-        description="SVR regularization parameter")
+        default=1.0, description="SVR regularization parameter"
+    )
     svr_epsilon: float = Field(
-        default=0.1,
-        description="SVR epsilon parameter")
+        default=0.1, description="SVR epsilon parameter"
+    )
     svr_gamma: str = Field(default="scale", description="SVR gamma parameter")
 
     # Random Forest
     rf_n_estimators: int = Field(
-        default=100, description="RF number of estimators")
+        default=100, description="RF number of estimators"
+    )
     rf_max_depth: Optional[int] = Field(
-        default=None, description="RF max depth")
+        default=None, description="RF max depth"
+    )
     rf_min_samples_split: int = Field(
-        default=2, description="RF min samples split")
+        default=2, description="RF min samples split"
+    )
     rf_min_samples_leaf: int = Field(
-        default=1, description="RF min samples leaf")
+        default=1, description="RF min samples leaf"
+    )
 
     # XGBoost
     xgb_n_estimators: int = Field(
-        default=100, description="XGB number of estimators")
+        default=100, description="XGB number of estimators"
+    )
     xgb_learning_rate: float = Field(
-        default=0.1, description="XGB learning rate")
+        default=0.1, description="XGB learning rate"
+    )
     xgb_max_depth: int = Field(default=3, description="XGB max depth")
     xgb_subsample: float = Field(default=0.8, description="XGB subsample")
     xgb_colsample_bytree: float = Field(
-        default=0.8, description="XGB colsample_bytree")
+        default=0.8, description="XGB colsample_bytree"
+    )
 
     # LightGBM
     lgbm_n_estimators: int = Field(
-        default=100, description="LGBM number of estimators")
+        default=100, description="LGBM number of estimators"
+    )
     lgbm_learning_rate: float = Field(
-        default=0.1, description="LGBM learning rate")
+        default=0.1, description="LGBM learning rate"
+    )
     lgbm_max_depth: int = Field(default=-1, description="LGBM max depth")
     lgbm_num_leaves: int = Field(default=31, description="LGBM num leaves")
 
@@ -179,10 +196,12 @@ class DataConfig(BaseModel):
     )
     transform: TransformType = Field(
         default=TransformType.SNV,
-        description="Spectral transformation to apply")
+        description="Spectral transformation to apply",
+    )
     savgol: SavGolConfig = Field(
         default_factory=SavGolConfig,
-        description="Savitzky-Golay filter configuration")
+        description="Savitzky-Golay filter configuration",
+    )
     remove_outliers: bool = Field(
         default=False, description="Whether to detect and remove outliers"
     )
@@ -192,10 +211,11 @@ class MLflowConfig(BaseModel):
     """Configuration for MLflow tracking."""
 
     enabled: bool = Field(
-        default=False,
-        description="Whether to use MLflow tracking")
+        default=False, description="Whether to use MLflow tracking"
+    )
     tracking_uri: Optional[str] = Field(
-        default=None, description="MLflow tracking URI")
+        default=None, description="MLflow tracking URI"
+    )
     experiment_name: str = Field(
         default="nirs-tomato", description="MLflow experiment name"
     )
@@ -217,8 +237,8 @@ class ExperimentConfig(BaseModel):
         default="results", description="Directory to save experiment results"
     )
     verbose: bool = Field(
-        default=False,
-        description="Whether to enable verbose output")
+        default=False, description="Whether to enable verbose output"
+    )
     data: DataConfig = Field(..., description="Data configuration")
     feature_selection: FeatureSelectionConfig = Field(
         default_factory=FeatureSelectionConfig,
@@ -244,7 +264,8 @@ class ExperimentConfig(BaseModel):
         """
         if not os.path.exists(yaml_path):
             raise FileNotFoundError(
-                f"Configuration file not found: {yaml_path}")
+                f"Configuration file not found: {yaml_path}"
+            )
 
         with open(yaml_path, "r") as file:
             config_dict = yaml.safe_load(file)
@@ -255,7 +276,8 @@ class ExperimentConfig(BaseModel):
             if isinstance(transform_value, str):
                 try:
                     config_dict["data"]["transform"] = TransformType(
-                        transform_value)
+                        transform_value
+                    )
                 except ValueError:
                     pass  # Leave as is if conversion fails
 
@@ -266,8 +288,9 @@ class ExperimentConfig(BaseModel):
             method_value = config_dict["feature_selection"]["method"]
             if isinstance(method_value, str):
                 try:
-                    config_dict["feature_selection"]["method"] = FeatureSelectionMethod(
-                        method_value)
+                    config_dict["feature_selection"]["method"] = (
+                        FeatureSelectionMethod(method_value)
+                    )
                 except ValueError:
                     pass
 
@@ -276,7 +299,8 @@ class ExperimentConfig(BaseModel):
             if isinstance(model_type_value, str):
                 try:
                     config_dict["model"]["model_type"] = ModelType(
-                        model_type_value)
+                        model_type_value
+                    )
                 except ValueError:
                     pass
 
@@ -298,7 +322,8 @@ class ExperimentConfig(BaseModel):
         # Convert Enum values to strings
         if "data" in config_dict and "transform" in config_dict["data"]:
             config_dict["data"]["transform"] = str(
-                config_dict["data"]["transform"])
+                config_dict["data"]["transform"]
+            )
 
         if (
             "feature_selection" in config_dict
@@ -310,14 +335,13 @@ class ExperimentConfig(BaseModel):
 
         if "model" in config_dict and "model_type" in config_dict["model"]:
             config_dict["model"]["model_type"] = str(
-                config_dict["model"]["model_type"])
+                config_dict["model"]["model_type"]
+            )
 
         with open(yaml_path, "w") as file:
             yaml.dump(
-                config_dict,
-                file,
-                default_flow_style=False,
-                sort_keys=False)
+                config_dict, file, default_flow_style=False, sort_keys=False
+            )
 
     def get_experiment_name(self) -> str:
         """
@@ -332,8 +356,11 @@ class ExperimentConfig(BaseModel):
             components.append(f"sg{self.data.savgol.window_length}")
 
         if self.feature_selection.method != FeatureSelectionMethod.NONE:
-            components.append(f"{self.feature_selection.method.value}{
-                self.feature_selection.n_features}")
+            components.append(
+                f"{self.feature_selection.method.value}{
+                    self.feature_selection.n_features
+                }"
+            )
 
         if self.model.tune_hyperparams:
             components.append("tuned")

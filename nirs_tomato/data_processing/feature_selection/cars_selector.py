@@ -1,5 +1,5 @@
 """
-Competitive Adaptive Reweighted Sampling (CARS) for Feature Selection in NIR Spectroscopy
+Competitive Adaptive Reweighted Sampling (CARS) for Feature Selection
 
 This module implements the CARS algorithm for selecting the most informative
 wavelengths from NIR spectral data by iteratively sampling subsets of features
@@ -21,8 +21,9 @@ class CARSSelector(BaseEstimator, TransformerMixin):
     """
     Competitive Adaptive Reweighted Sampling (CARS) for wavelength selection.
 
-    CARS is an algorithm that selects variables by adaptively sampling subsets of variables
-    according to their weights, which are derived from PLS regression coefficients.
+    CARS is an algorithm that selects variables by adaptively sampling subsets
+    of variables according to their weights, which are derived from
+    PLS regression coefficients.
 
     Parameters:
     -----------
@@ -40,7 +41,7 @@ class CARSSelector(BaseEstimator, TransformerMixin):
         Actual wavelength values (for visualization and interpretation).
     random_state : int, optional (default=None)
         Random seed for reproducibility.
-    """
+    """  
 
     def __init__(
         self,
@@ -65,8 +66,11 @@ class CARSSelector(BaseEstimator, TransformerMixin):
         self.rmse_history_ = None
         self.feature_subset_history_ = None
 
-    def fit(self, X: Union[pd.DataFrame, np.ndarray],
-            y: Union[pd.Series, np.ndarray]) -> "CARSSelector":
+    def fit(
+        self,
+        X: Union[pd.DataFrame, np.ndarray],
+        y: Union[pd.Series, np.ndarray],
+    ) -> "CARSSelector":
         """
         Run CARS to select features.
 
@@ -104,8 +108,9 @@ class CARSSelector(BaseEstimator, TransformerMixin):
         weights = np.abs(pls.coef_.ravel())
 
         # Normalize weights to [0, 1]
-        weights = (weights - weights.min()) / \
-            (weights.max() - weights.min() + 1e-10)
+        weights = (weights - weights.min()) / (
+            weights.max() - weights.min() + 1e-10
+        )
 
         # Storage for RMSE values and selected feature subsets
         rmse_history = []
@@ -151,15 +156,16 @@ class CARSSelector(BaseEstimator, TransformerMixin):
             # Cross-validation to evaluate this subset
             cv_rmse = 0
             kf = KFold(
-                n_splits=self.cv,
-                shuffle=True,
-                random_state=self.random_state)
+                n_splits=self.cv, shuffle=True, random_state=self.random_state
+            )
             fold_count = 0
 
             for train_idx, test_idx in kf.split(X_selected):
                 # Skip if train or test set too small
-                if len(train_idx) <= self.n_pls_components or len(
-                        test_idx) == 0:
+                if (
+                    len(train_idx) <= self.n_pls_components
+                    or len(test_idx) == 0
+                ):
                     continue
 
                 X_train, X_test = X_selected[train_idx], X_selected[test_idx]
@@ -167,9 +173,8 @@ class CARSSelector(BaseEstimator, TransformerMixin):
 
                 # Fit PLS on training data
                 n_comp = min(
-                    self.n_pls_components,
-                    X_train.shape[1],
-                    X_train.shape[0])
+                    self.n_pls_components, X_train.shape[1], X_train.shape[0]
+                )
                 pls_cv = PLSRegression(n_components=max(1, n_comp))
                 pls_cv.fit(X_train, y_train)
 
@@ -205,19 +210,23 @@ class CARSSelector(BaseEstimator, TransformerMixin):
             best_idx = np.argmin(rmse_history)
             self.selected_features_mask_ = feature_subset_history[best_idx]
             self.selected_features_indices_ = np.where(
-                self.selected_features_mask_)[0]
+                self.selected_features_mask_
+            )[0]
         else:
             # Find the subset with closest number of features to
             # n_features_to_select
-            n_features_per_subset = [np.sum(mask)
-                                     for mask in feature_subset_history]
+            n_features_per_subset = [
+                np.sum(mask) for mask in feature_subset_history
+            ]
             best_idx = np.argmin(
                 np.abs(
-                    np.array(n_features_per_subset) -
-                    self.n_features_to_select))
+                    np.array(n_features_per_subset) - self.n_features_to_select
+                )
+            )
             self.selected_features_mask_ = feature_subset_history[best_idx]
             self.selected_features_indices_ = np.where(
-                self.selected_features_mask_)[0]
+                self.selected_features_mask_
+            )[0]
 
         self.weights_ = weights
         self.rmse_history_ = rmse_history
@@ -249,8 +258,11 @@ class CARSSelector(BaseEstimator, TransformerMixin):
         else:
             return X[:, self.selected_features_mask_]
 
-    def plot_selection_history(self, figsize: Tuple[int, int] = (
-            12, 6), save_path: Optional[str] = None) -> plt.Figure:
+    def plot_selection_history(
+        self,
+        figsize: Tuple[int, int] = (12, 6),
+        save_path: Optional[str] = None,
+    ) -> plt.Figure:
         """
         Plot the RMSE history during feature selection.
 
@@ -272,8 +284,9 @@ class CARSSelector(BaseEstimator, TransformerMixin):
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=figsize)
 
         # Plot RMSE history
-        ax1.plot(range(1, len(self.rmse_history_) + 1),
-                 self.rmse_history_, "o-")
+        ax1.plot(
+            range(1, len(self.rmse_history_) + 1), self.rmse_history_, "o-"
+        )
         ax1.set_xlabel("Sampling Run")
         ax1.set_ylabel("RMSE")
         ax1.set_title("RMSE vs. Sampling Run")
@@ -292,8 +305,11 @@ class CARSSelector(BaseEstimator, TransformerMixin):
 
         return fig
 
-    def plot_selected_wavelengths(self, figsize: Tuple[int, int] = (
-            12, 6), save_path: Optional[str] = None) -> plt.Figure:
+    def plot_selected_wavelengths(
+        self,
+        figsize: Tuple[int, int] = (12, 6),
+        save_path: Optional[str] = None,
+    ) -> plt.Figure:
         """
         Plot the selected wavelengths.
 
@@ -316,7 +332,9 @@ class CARSSelector(BaseEstimator, TransformerMixin):
 
         if self.wavelengths is not None:
             x_values = self.wavelengths
-            selected_wavelengths = self.wavelengths[self.selected_features_mask_]
+            selected_wavelengths = self.wavelengths[
+                self.selected_features_mask_
+            ]
         else:
             x_values = np.arange(len(self.selected_features_mask_))
             selected_wavelengths = x_values[self.selected_features_mask_]
@@ -327,7 +345,8 @@ class CARSSelector(BaseEstimator, TransformerMixin):
             np.zeros_like(x_values),
             "o",
             color="lightgray",
-            alpha=0.5)
+            alpha=0.5,
+        )
 
         # Highlight selected wavelengths
         ax.plot(
@@ -340,7 +359,10 @@ class CARSSelector(BaseEstimator, TransformerMixin):
 
         ax.set_xlabel("Wavelength (nm)")
         ax.set_title(
-            f"Selected Wavelengths (CARS): {len(selected_wavelengths)} features")
+            f"Selected Wavelengths (CARS): {
+                len(selected_wavelengths)
+            } features"
+        )
         ax.set_yticks([])
 
         plt.tight_layout()

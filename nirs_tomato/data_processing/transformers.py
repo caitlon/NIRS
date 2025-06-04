@@ -3,7 +3,7 @@ NIR Preprocessing Transformers Module
 
 This module contains preprocessing transformers for NIR spectral data analysis.
 All transformers follow scikit-learn's BaseEstimator and TransformerMixin interfaces.
-"""
+"""  
 
 from typing import Any, Dict, List, Optional, Union
 
@@ -28,7 +28,7 @@ class SNVTransformer(BaseEstimator, TransformerMixin):
 
     For each spectrum (row), this subtracts the mean and divides by the standard deviation.
     This helps reduce scatter effects and baseline variations.
-    """
+    """  
 
     def __init__(self, spectral_cols: Optional[List[str]] = None):
         self.spectral_cols = spectral_cols
@@ -130,7 +130,7 @@ class MSCTransformer(BaseEstimator, TransformerMixin):
 
     Corrects for scatter effects by regressing each spectrum against a reference
     spectrum (usually the mean) and then correcting using the slope and intercept.
-    """
+    """  
 
     def __init__(self, spectral_cols: Optional[List[str]] = None):
         self.mean_spectrum = None
@@ -205,7 +205,9 @@ class OutlierDetector(BaseEstimator, TransformerMixin):
         from .utils import detect_outliers_pca, detect_outliers_zscore
 
         # Use spectral columns if specified, otherwise use all columns
-        spectral_data = X[self.spectral_cols].values if self.spectral_cols else X.values
+        spectral_data = (
+            X[self.spectral_cols].values if self.spectral_cols else X.values
+        )
 
         if self.method == "zscore":
             self.outlier_mask_ = detect_outliers_zscore(
@@ -217,13 +219,16 @@ class OutlierDetector(BaseEstimator, TransformerMixin):
             )
         elif self.method == "both":
             z_outliers = detect_outliers_zscore(
-                spectral_data, threshold=self.threshold)
+                spectral_data, threshold=self.threshold
+            )
             pca_outliers = detect_outliers_pca(
-                spectral_data, threshold=self.threshold)
+                spectral_data, threshold=self.threshold
+            )
             self.outlier_mask_ = z_outliers | pca_outliers
         else:
             raise ValueError(
-                f"Unknown outlier detection method: {self.method}")
+                f"Unknown outlier detection method: {self.method}"
+            )
 
         return self
 
@@ -296,9 +301,8 @@ class PCATransformer(BaseEstimator, TransformerMixin):
         # Create DataFrame with PCA components
         component_names = [f"PC{i + 1}" for i in range(pca_result.shape[1])]
         df_pca = pd.DataFrame(
-            pca_result,
-            index=X.index,
-            columns=component_names)
+            pca_result, index=X.index, columns=component_names
+        )
 
         # Combine with non-spectral columns if specified
         if self.spectral_cols:

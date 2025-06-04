@@ -18,7 +18,7 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 
 from ..constants import DEFAULT_DATASET_PATH, TARGET_COLUMN
-from ..transformers import SNVTransformer
+from ..transformers import MSCTransformer, SavGolTransformer, SNVTransformer
 from ..utils import (
     add_sample_identifier,
     detect_outliers_pca,
@@ -31,6 +31,183 @@ from ..utils import (
     split_data,
 )
 from .preprocessing import create_preprocessing_pipeline
+
+
+def get_wavelengths_from_columns(column_names: List[str]) -> List[int]:
+    """
+    Extract wavelength values from column names.
+    
+    Args:
+        column_names: List of column names like 'wl_900', 'wl_901', etc.
+        
+    Returns:
+        List of extracted wavelength values as integers
+    """
+    wavelengths = []
+    for col in column_names:
+        # Try to extract the wavelength number from the column name
+        if col.startswith('wl_'):
+            try:
+                wl = int(col.split('_')[1])
+                wavelengths.append(wl)
+            except (ValueError, IndexError):
+                continue
+    return wavelengths
+
+
+def apply_spectral_transformation(
+    X: np.ndarray,
+    transform_method: str = "none",
+    **kwargs: Any
+) -> np.ndarray:
+    """
+    Apply spectral transformation to data.
+    
+    Args:
+        X: Spectral data array
+        transform_method: Transformation method ('snv', 'msc', 'savgol', 'none')
+        **kwargs: Additional arguments for transformers
+        
+    Returns:
+        Transformed spectral data
+    """
+    if transform_method == "none":
+        return X
+        
+    if transform_method == "snv":
+        transformer = SNVTransformer()
+    elif transform_method == "msc":
+        transformer = MSCTransformer()
+    elif transform_method == "savgol":
+        window_length = kwargs.get('window_length', 15)
+        polyorder = kwargs.get('polyorder', 2)
+        deriv = kwargs.get('deriv', 0)
+        transformer = SavGolTransformer(
+            window_length=window_length, 
+            polyorder=polyorder, 
+            deriv=deriv
+        )
+    else:
+        raise ValueError(f"Unknown transformation method: {transform_method}")
+    
+    return transformer.fit_transform(X)
+
+
+def process_spectral_data(
+    data: pd.DataFrame,
+    target_column: str,
+    exclude_columns: List[str] = None,
+    transform_method: str = "none",
+    apply_savgol: bool = False,
+    window_length: int = 15,
+    polyorder: int = 2,
+    deriv: int = 0,
+    feature_selection_method: str = "none",
+    n_features: int = 20,
+    verbose: bool = False,
+) -> Dict[str, Any]:
+    """
+    Process spectral data with transformations and optional feature selection.
+    
+    Args:
+        data: DataFrame with spectral and non-spectral data
+        target_column: Name of target column
+        exclude_columns: Columns to exclude from processing
+        transform_method: Transformation method ('snv', 'msc', 'none')
+        apply_savgol: Whether to apply Savitzky-Golay filtering
+        window_length: Window length for SG filter
+        polyorder: Polynomial order for SG filter
+        deriv: Derivative order for SG filter
+        feature_selection_method: Method for feature selection ('vip', 'ga', 'cars', 'none')
+        n_features: Number of features to select
+        verbose: Whether to log processing details
+        
+    Returns:
+        Dictionary with processed data and metadata
+    """
+    # Configure logging
+    logger = logging.getLogger(__name__)
+    exclude_columns = exclude_columns or []
+    
+    # Step 1: Identify spectral columns
+    spectral_cols = identify_spectral_columns(data)
+    
+    # Step 2: Extract wavelengths from column names
+    wavelengths = get_wavelengths_from_columns(spectral_cols)
+    
+    # Step 3: Extract features and target
+    X = data[spectral_cols].copy()
+    y = data[target_column].copy() if target_column in data.columns else None
+    
+    # Step 4: Apply spectral transformations
+    X_values = X.values
+    if transform_method != "none":
+        if verbose:
+            logger.info(f"Applying {transform_method.upper()} transformation")
+        X_transformed = apply_spectral_transformation(
+            X_values, 
+            transform_method=transform_method
+        )
+        X = pd.DataFrame(X_transformed, index=X.index, columns=X.columns)
+    
+    # Step 5: Apply Savitzky-Golay if requested
+    if apply_savgol:
+        if verbose:
+            logger.info(f"Applying Savitzky-Golay filter (window={window_length}, "
+                       f"polyorder={polyorder}, deriv={deriv})")
+        X_sg = apply_spectral_transformation(
+            X.values, 
+            transform_method="savgol",
+            window_length=window_length,
+            polyorder=polyorder,
+            deriv=deriv
+        )
+        X = pd.DataFrame(X_sg, index=X.index, columns=X.columns)
+    
+    # Step 6: Apply feature selection if requested
+    selected_features = []
+    if feature_selection_method != "none" and y is not None:
+        if verbose:
+            logger.info(f"Applying {feature_selection_method.upper()} feature selection")
+        
+        from ..feature_selection import (
+            CARSSelector,
+            GeneticAlgorithmSelector,
+            PLSVIPSelector,
+        )
+        
+        if feature_selection_method == "vip":
+            selector = PLSVIPSelector(n_features_to_select=n_features)
+        elif feature_selection_method == "ga":
+            selector = GeneticAlgorithmSelector(n_features_to_select=n_features)
+        elif feature_selection_method == "cars":
+            selector = CARSSelector(n_features_to_select=n_features)
+        else:
+            raise ValueError(f"Unknown feature selection method: {feature_selection_method}")
+        
+        # Fit the selector
+        selector.fit(X, y)
+        
+        # Get selected features
+        if hasattr(selector, 'selected_features_indices_'):
+            selected_indices = selector.selected_features_indices_
+            selected_features = [X.columns[i] for i in selected_indices]
+            X = X[selected_features]
+        
+            if verbose:
+                logger.info(f"Selected {len(selected_features)} features")
+    
+    # Prepare result
+    result = {
+        "data": data,
+        "X": X,
+        "y": y,
+        "wavelengths": wavelengths,
+        "spectral_columns": spectral_cols,
+        "selected_features": selected_features
+    }
+    
+    return result
 
 
 def process_and_save_data(
@@ -92,13 +269,14 @@ def process_and_save_data(
     preprocessing_info = processed_data["preprocessing_info"]
 
     # Split data into train, validation, and test sets
-    logger.info(f"Splitting data into train, validation, and test sets...")
+    logger.info("Splitting data into train, validation, and test sets...")
     splits = split_data(
         X=X,
         y=y,
         test_size=test_size,
         val_size=val_size,
-        random_state=random_state)
+        random_state=random_state,
+    )
 
     # Create dataset with all information
     dataset = {
@@ -170,11 +348,14 @@ def process_and_save_data(
         pd.Series(info_serializable).to_json(info_path)
         saved_files["info_json"] = info_path
 
-        logger.info(f"Saved dataset as CSV files in {output_dir}")
+        logger.info("Saved dataset as CSV files in " + output_dir)
 
     else:
-        raise ValueError(f"Invalid save format: {
-            save_format}. Use 'joblib', 'pickle', or 'csv'.")
+        raise ValueError(
+            f"Invalid save format: {
+                save_format
+            }. Use 'joblib', 'pickle', or 'csv'."
+        )
 
     return saved_files
 
@@ -244,14 +425,16 @@ def load_and_preprocess_data(
     # Check if target column exists
     if TARGET_COLUMN not in df.columns:
         raise ValueError(
-            f"Target column '{TARGET_COLUMN}' not found in the dataset.")
+            f"Target column '{TARGET_COLUMN}' not found in the dataset."
+        )
 
     # Identify spectral columns
     spectral_cols, non_spectral_cols = identify_spectral_columns(df)
     logger.info(
-        f"Identified {
-            len(spectral_cols)} spectral columns and {
-            len(non_spectral_cols)} non-spectral columns")
+        f"Identified {len(spectral_cols)} spectral columns and {
+            len(non_spectral_cols)
+        } non-spectral columns"
+    )
 
     # Separate target from features
     y = df[TARGET_COLUMN]
@@ -271,7 +454,8 @@ def load_and_preprocess_data(
         if not categorical_cols.empty:
             categorical_imputer = SimpleImputer(strategy="most_frequent")
             X[categorical_cols] = categorical_imputer.fit_transform(
-                X[categorical_cols])
+                X[categorical_cols]
+            )
 
     # Create and apply preprocessing pipeline
     logger.info(f"Applying preprocessing method: {preprocessing_method}")
@@ -292,7 +476,8 @@ def load_and_preprocess_data(
         # If output is a DataFrame, combine with non-spectral columns
         if isinstance(X_spectral_processed, pd.DataFrame):
             non_target_cols = [
-                col for col in non_spectral_cols if col != TARGET_COLUMN]
+                col for col in non_spectral_cols if col != TARGET_COLUMN
+            ]
             if non_target_cols:
                 X_processed = pd.concat(
                     [X_spectral_processed, X[non_target_cols]], axis=1
@@ -302,16 +487,22 @@ def load_and_preprocess_data(
         else:
             # Convert numpy array to DataFrame
             X_processed = pd.DataFrame(
-                X_spectral_processed, index=X.index, columns=[
-                    f"feature_{i}" for i in range(
-                        X_spectral_processed.shape[1])], )
+                X_spectral_processed,
+                index=X.index,
+                columns=[
+                    f"feature_{i}"
+                    for i in range(X_spectral_processed.shape[1])
+                ],
+            )
 
             # Add non-spectral columns
             non_target_cols = [
-                col for col in non_spectral_cols if col != TARGET_COLUMN]
+                col for col in non_spectral_cols if col != TARGET_COLUMN
+            ]
             if non_target_cols:
                 X_processed = pd.concat(
-                    [X_processed, X[non_target_cols]], axis=1)
+                    [X_processed, X[non_target_cols]], axis=1
+                )
     else:
         # No spectral columns identified, just pass through the pipeline
         X_processed = pipeline.fit_transform(X)
@@ -383,22 +574,24 @@ def preprocess_spectra(
 
     # Step 2: Identify spectral and non-spectral columns
     spectral_columns, non_spectral_columns = identify_spectral_columns(
-        df_fixed)
+        df_fixed
+    )
     result["spectral_columns"] = spectral_columns
     result["non_spectral_columns"] = non_spectral_columns
 
     if verbose:
         logger.info(f"Identified {len(spectral_columns)} spectral columns")
         logger.info(
-            f"Identified {
-                len(non_spectral_columns)} non-spectral columns")
+            f"Identified {len(non_spectral_columns)} non-spectral columns"
+        )
 
     # Step 3: Remove duplicates
     df_no_duplicates = remove_duplicate_rows(df_fixed, verbose=verbose)
 
     # Step 4: Remove constant and empty columns
     df_cleaned = remove_constant_and_empty_columns(
-        df_no_duplicates, verbose=verbose)
+        df_no_duplicates, verbose=verbose
+    )
 
     # Step 5: Filter out non-numeric features that can't be used for modeling
     # Define columns to exclude (target and explicitly excluded columns)
@@ -413,7 +606,8 @@ def preprocess_spectra(
 
     # Step 6: Create and apply preprocessing pipeline for spectral data
     spectral_columns = [
-        col for col in spectral_columns if col in df_numeric.columns]
+        col for col in spectral_columns if col in df_numeric.columns
+    ]
 
     # Create pipeline
     steps = []
@@ -428,8 +622,8 @@ def preprocess_spectra(
     # Apply preprocessing
     if verbose:
         logger.info(
-            f"Applying preprocessing pipeline with {
-                len(steps)} transformers")
+            f"Applying preprocessing pipeline with {len(steps)} transformers"
+        )
 
     X_spectral_transformed = preprocessing_pipeline.fit_transform(X_spectral)
 
@@ -437,7 +631,8 @@ def preprocess_spectra(
     X_spectral_df = pd.DataFrame(
         X_spectral_transformed,
         columns=spectral_columns,
-        index=X_spectral.index)
+        index=X_spectral.index,
+    )
 
     # Step 7: Combine with non-spectral numeric features
     non_spectral_numeric_cols = [
@@ -450,9 +645,12 @@ def preprocess_spectra(
         if verbose:
             logger.info(
                 f"Adding {
-                    len(non_spectral_numeric_cols)} non-spectral numeric features")
+                    len(non_spectral_numeric_cols)
+                } non-spectral numeric features"
+            )
         X = pd.concat(
-            [X_spectral_df, df_numeric[non_spectral_numeric_cols]], axis=1)
+            [X_spectral_df, df_numeric[non_spectral_numeric_cols]], axis=1
+        )
     else:
         X = X_spectral_df
 
@@ -467,8 +665,11 @@ def preprocess_spectra(
 
         outlier_count = np.sum(outlier_mask)
         if verbose:
-            logger.info(f"Detected {outlier_count} outliers using {
-                outlier_method} method")
+            logger.info(
+                f"Detected {outlier_count} outliers using {
+                    outlier_method
+                } method"
+            )
 
         # Remove outliers
         if outlier_count > 0:
@@ -483,7 +684,8 @@ def preprocess_spectra(
     else:
         if verbose:
             logger.warning(
-                f"Target column '{target_column}' not found in DataFrame")
+                f"Target column '{target_column}' not found in DataFrame"
+            )
         result["y"] = None
 
     # Add results to dictionary

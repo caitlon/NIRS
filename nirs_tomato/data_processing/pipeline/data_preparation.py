@@ -68,8 +68,8 @@ def prepare_data_for_regression(
     # Filter features if specified
     if exclude_features:
         X = X.drop(
-            columns=[
-                col for col in exclude_features if col in X.columns])
+            columns=[col for col in exclude_features if col in X.columns]
+        )
         logger.info(f"Excluded {len(exclude_features)} features")
 
     if additional_features:
@@ -80,18 +80,20 @@ def prepare_data_for_regression(
         ]
         X = X[keep_cols]
         logger.info(
-            f"Keeping {
-                len(spectral_cols)} spectral columns and {
-                len(additional_features)} additional features")
+            f"Keeping {len(spectral_cols)} spectral columns and {
+                len(additional_features)
+            } additional features"
+        )
 
     # Split data into train, validation, and test sets
-    logger.info(f"Splitting data into train, validation, and test sets...")
+    logger.info("Splitting data into train, validation, and test sets...")
     splits = split_data(
         X=X,
         y=y,
         test_size=test_size,
         val_size=val_size,
-        random_state=random_state)
+        random_state=random_state,
+    )
 
     return {
         "X_train": splits["X_train"],

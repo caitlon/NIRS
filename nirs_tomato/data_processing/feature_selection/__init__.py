@@ -8,8 +8,8 @@ specifically designed for NIR spectral data:
 2. Competitive Adaptive Reweighted Sampling (CARS)
 3. Variable Importance in Projection (VIP) for PLS models
 
-All selectors follow scikit-learn's BaseEstimator and TransformerMixin interfaces
-for seamless integration with preprocessing pipelines.
+All selectors follow scikit-learn's BaseEstimator and TransformerMixin
+interfaces for seamless integration with preprocessing pipelines.
 """
 
 from .cars_selector import CARSSelector

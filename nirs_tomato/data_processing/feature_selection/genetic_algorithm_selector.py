@@ -45,7 +45,7 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
         Actual wavelength values (for visualization and interpretation).
     random_state : int, optional (default=None)
         Random seed for reproducibility.
-    """
+    """  
 
     def __init__(
         self,
@@ -75,7 +75,9 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
         self.evolution_history_ = None
 
     def fit(
-        self, X: Union[pd.DataFrame, np.ndarray], y: Union[pd.Series, np.ndarray]
+        self,
+        X: Union[pd.DataFrame, np.ndarray],
+        y: Union[pd.Series, np.ndarray],
     ) -> "GeneticAlgorithmSelector":
         """
         Run the genetic algorithm to select features.
@@ -185,11 +187,12 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
         best_individual = hall_of_fame[0]
         self.selected_features_mask_ = np.array(best_individual, dtype=bool)
         self.selected_features_indices_ = np.where(
-            self.selected_features_mask_)[0]
+            self.selected_features_mask_
+        )[0]
 
         # Limit to n_features_to_select if necessary
         if sum(self.selected_features_mask_) > self.n_features_to_select:
-            # If too many features selected, keep only the top n_features_to_select
+            # If too many features selected, keep only the top n_features_to_select  
             # based on individual feature importance (correlation with target)
             correlations = np.array(
                 [
@@ -198,7 +201,7 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
                 ]
             )
             top_indices = self.selected_features_indices_[
-                np.argsort(correlations)[-self.n_features_to_select:]
+                np.argsort(correlations)[-self.n_features_to_select :]
             ]
             new_mask = np.zeros(n_features, dtype=bool)
             new_mask[top_indices] = True
@@ -228,15 +231,19 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
         """
         if self.selected_features_mask_ is None:
             raise ValueError(
-                "GeneticAlgorithmSelector has not been fitted yet.")
+                "GeneticAlgorithmSelector has not been fitted yet."
+            )
 
         if isinstance(X, pd.DataFrame):
             return X.iloc[:, self.selected_features_mask_]
         else:
             return X[:, self.selected_features_mask_]
 
-    def plot_selected_wavelengths(self, figsize: Tuple[int, int] = (
-            12, 6), save_path: Optional[str] = None) -> plt.Figure:
+    def plot_selected_wavelengths(
+        self,
+        figsize: Tuple[int, int] = (12, 6),
+        save_path: Optional[str] = None,
+    ) -> plt.Figure:
         """
         Plot the selected wavelengths.
 
@@ -254,13 +261,16 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
         """
         if self.selected_features_mask_ is None:
             raise ValueError(
-                "GeneticAlgorithmSelector has not been fitted yet.")
+                "GeneticAlgorithmSelector has not been fitted yet."
+            )
 
         fig, ax = plt.subplots(figsize=figsize)
 
         if self.wavelengths is not None:
             x_values = self.wavelengths
-            selected_wavelengths = self.wavelengths[self.selected_features_mask_]
+            selected_wavelengths = self.wavelengths[
+                self.selected_features_mask_
+            ]
         else:
             x_values = np.arange(len(self.selected_features_mask_))
             selected_wavelengths = x_values[self.selected_features_mask_]
@@ -271,7 +281,8 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
             np.zeros_like(x_values),
             "o",
             color="lightgray",
-            alpha=0.5)
+            alpha=0.5,
+        )
 
         # Highlight selected wavelengths
         ax.plot(
@@ -284,7 +295,8 @@ class GeneticAlgorithmSelector(BaseEstimator, TransformerMixin):
 
         ax.set_xlabel("Wavelength (nm)")
         ax.set_title(
-            f"Selected Wavelengths (GA): {len(selected_wavelengths)} features")
+            f"Selected Wavelengths (GA): {len(selected_wavelengths)} features"
+        )
         ax.set_yticks([])
 
         plt.tight_layout()

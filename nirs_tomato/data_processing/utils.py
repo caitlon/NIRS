@@ -16,7 +16,7 @@ Functions:
 
 These utilities support the transformers and provide core functionality for
 preprocessing NIR tomato spectroscopy datasets before modeling.
-"""
+"""  
 
 import logging
 import re
@@ -78,9 +78,6 @@ def fix_column_names(df: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
     Returns:
         DataFrame with corrected column names
     """
-    # Configure logging
-    logger = logging.getLogger(__name__)
-
     df_fixed = df.copy()
 
     # Example fix if needed
@@ -90,8 +87,8 @@ def fix_column_names(df: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
 
 
 def remove_duplicate_rows(
-        df: pd.DataFrame,
-        verbose: bool = False) -> pd.DataFrame:
+    df: pd.DataFrame, verbose: bool = False
+) -> pd.DataFrame:
     """
     Identify and remove completely duplicate rows in the dataset.
 
@@ -119,7 +116,9 @@ def remove_duplicate_rows(
         if verbose:
             logger.info(
                 f"Removed {removed_count} duplicate rows. Remaining rows: {
-                    len(df_cleaned)}")
+                    len(df_cleaned)
+                }"
+            )
 
         return df_cleaned
     else:
@@ -208,10 +207,8 @@ def detect_outliers_pca(
 
     # Apply PCA
     pca = PCA(
-        n_components=min(
-            n_components,
-            X_scaled.shape[1],
-            X_scaled.shape[0]))
+        n_components=min(n_components, X_scaled.shape[1], X_scaled.shape[0])
+    )
     X_pca = pca.fit_transform(X_scaled)
 
     # Calculate Hotelling's T2 statistic
@@ -247,13 +244,13 @@ def remove_constant_and_empty_columns(
     logger = logging.getLogger(__name__)
 
     df_cleaned = df.copy()
-    original_columns = df_cleaned.columns.tolist()
     removed_columns = []
 
     # Remove empty columns
     if remove_empty:
         empty_cols = [
-            col for col in df_cleaned.columns if df_cleaned[col].isna().all()]
+            col for col in df_cleaned.columns if df_cleaned[col].isna().all()
+        ]
         if empty_cols:
             df_cleaned = df_cleaned.drop(columns=empty_cols)
             removed_columns.extend(empty_cols)
@@ -295,7 +292,8 @@ def split_data(
         X: Feature DataFrame
         y: Target Series
         test_size: Proportion of data for test set
-        val_size: Proportion of data for validation set (from remaining after test)
+        val_size: Proportion of data for validation set
+            (from remaining after test)
         random_state: Random seed for reproducibility
         stratify: Optional Series to use for stratified splitting
 
@@ -304,13 +302,14 @@ def split_data(
     """
     # First split: separate test set
     if stratify is not None:
-        X_temp, X_test, y_temp, y_test, strat_temp, strat_test = train_test_split(
-            X, y, stratify, test_size=test_size, random_state=random_state)
+        X_temp, X_test, y_temp, y_test, strat_temp, _ = train_test_split(
+            X, y, stratify, test_size=test_size, random_state=random_state
+        )
     else:
         X_temp, X_test, y_temp, y_test = train_test_split(
             X, y, test_size=test_size, random_state=random_state
         )
-        strat_temp = strat_test = None
+        strat_temp = None
 
     # Second split: separate validation set if requested
     if val_size:
@@ -327,7 +326,11 @@ def split_data(
             )
         else:
             X_train, X_val, y_train, y_val = train_test_split(
-                X_temp, y_temp, test_size=effective_val_size, random_state=random_state)
+                X_temp,
+                y_temp,
+                test_size=effective_val_size,
+                random_state=random_state,
+            )
     else:
         # No validation set
         X_train, y_train = X_temp, y_temp
@@ -369,7 +372,7 @@ def filter_numeric_features(
 
     Returns:
         DataFrame with only numeric columns or explicitly kept columns
-    """
+    """  
     # Configure logging
     logger = logging.getLogger(__name__)
 
@@ -386,19 +389,22 @@ def filter_numeric_features(
             df_filtered = df_filtered.drop(columns=columns_to_drop)
             if verbose:
                 logger.info(
-                    f"Excluded {
-                        len(columns_to_drop)} specified columns: {columns_to_drop}")
+                    f"Excluded {len(columns_to_drop)} specified columns: {
+                        columns_to_drop
+                    }"
+                )
 
     # If keep_columns is specified, keep only those columns
     if keep_columns:
         keep_columns = [
-            col for col in keep_columns if col in df_filtered.columns]
+            col for col in keep_columns if col in df_filtered.columns
+        ]
         if keep_columns:
             df_filtered = df_filtered[keep_columns]
             if verbose:
                 logger.info(
-                    f"Keeping only {
-                        len(keep_columns)} specified columns")
+                    f"Keeping only {len(keep_columns)} specified columns"
+                )
             return df_filtered
 
     # Otherwise, filter to keep only numeric columns
@@ -410,7 +416,7 @@ def filter_numeric_features(
         removed_columns = set(initial_columns) - set(df_numeric.columns)
         if removed_columns:
             logger.info(
-                f"Removed {len(removed_columns)} non-numeric columns: {list(removed_columns)}"
+                f"Removed {len(removed_columns)} non-numeric columns: {list(removed_columns)}"  
             )
         logger.info(f"Kept {len(df_numeric.columns)} numeric columns")
 

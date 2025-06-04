@@ -3,7 +3,7 @@ Variable Importance in Projection (VIP) for PLS Feature Selection in NIR Spectro
 
 This module implements the VIP method for selecting the most informative
 wavelengths from NIR spectral data based on their importance in PLS models.
-"""
+"""  
 
 from typing import List, Optional, Tuple, Union
 
@@ -54,8 +54,11 @@ class PLSVIPSelector(BaseEstimator, TransformerMixin):
         self.vip_scores_ = None
         self.pls_model_ = None
 
-    def fit(self, X: Union[pd.DataFrame, np.ndarray],
-            y: Union[pd.Series, np.ndarray]) -> "PLSVIPSelector":
+    def fit(
+        self,
+        X: Union[pd.DataFrame, np.ndarray],
+        y: Union[pd.Series, np.ndarray],
+    ) -> "PLSVIPSelector":
         """
         Compute VIP scores and select features.
 
@@ -98,7 +101,8 @@ class PLSVIPSelector(BaseEstimator, TransformerMixin):
 
         self.selected_features_mask_ = self.vip_scores_ >= vip_threshold
         self.selected_features_indices_ = np.where(
-            self.selected_features_mask_)[0]
+            self.selected_features_mask_
+        )[0]
 
         return self
 
@@ -152,17 +156,11 @@ class PLSVIPSelector(BaseEstimator, TransformerMixin):
         # Get PLS weights
         w = pls_model.x_weights_
 
-        # Get PLS loadings
-        p = pls_model.x_loadings_
-
         # Number of components
         n_comp = pls_model.n_components
 
         # Explained variance by each component
         q = np.var(t, axis=0)
-
-        # Sum of squares of all T scores
-        t_ss = np.sum(t**2, axis=0)
 
         # Initialize VIP scores
         vip_scores = np.zeros(n_features)
@@ -171,15 +169,19 @@ class PLSVIPSelector(BaseEstimator, TransformerMixin):
         for j in range(n_features):
             weighted_sum = 0
             for i in range(n_comp):
-                weighted_sum += q[i] * \
-                    (w[j, i] / np.sqrt(np.sum(w[:, i] ** 2))) ** 2
+                weighted_sum += (
+                    q[i] * (w[j, i] / np.sqrt(np.sum(w[:, i] ** 2))) ** 2
+                )
 
             vip_scores[j] = np.sqrt(n_features * weighted_sum / np.sum(q))
 
         return vip_scores
 
-    def plot_vip_scores(self, figsize: Tuple[int, int] = (
-            12, 6), save_path: Optional[str] = None) -> plt.Figure:
+    def plot_vip_scores(
+        self,
+        figsize: Tuple[int, int] = (12, 6),
+        save_path: Optional[str] = None,
+    ) -> plt.Figure:
         """
         Plot VIP scores for all features.
 
@@ -217,8 +219,9 @@ class PLSVIPSelector(BaseEstimator, TransformerMixin):
                 label=f"Threshold = {self.threshold}",
             )
         else:
-            vip_threshold = np.sort(
-                self.vip_scores_)[-self.n_features_to_select]
+            vip_threshold = np.sort(self.vip_scores_)[
+                -self.n_features_to_select
+            ]
             ax.axhline(
                 y=vip_threshold,
                 color="r",
@@ -228,7 +231,9 @@ class PLSVIPSelector(BaseEstimator, TransformerMixin):
 
         # Highlight selected wavelengths
         if self.wavelengths is not None:
-            selected_wavelengths = self.wavelengths[self.selected_features_mask_]
+            selected_wavelengths = self.wavelengths[
+                self.selected_features_mask_
+            ]
         else:
             selected_wavelengths = x_values[self.selected_features_mask_]
 
@@ -238,13 +243,20 @@ class PLSVIPSelector(BaseEstimator, TransformerMixin):
             selected_vips,
             "ro",
             markersize=6,
-            label="Selected")
+            label="Selected",
+        )
 
         ax.set_xlabel(
-            "Wavelength (nm)" if self.wavelengths is not None else "Feature Index")
+            "Wavelength (nm)"
+            if self.wavelengths is not None
+            else "Feature Index"
+        )
         ax.set_ylabel("VIP Score")
         ax.set_title(
-            f"PLS VIP Scores (Selected: {np.sum(self.selected_features_mask_)} features)")
+            f"PLS VIP Scores (Selected: {
+                np.sum(self.selected_features_mask_)
+            } features)"
+        )
         ax.legend()
 
         plt.tight_layout()
