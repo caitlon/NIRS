@@ -357,9 +357,7 @@ class ExperimentConfig(BaseModel):
 
         if self.feature_selection.method != FeatureSelectionMethod.NONE:
             components.append(
-                f"{self.feature_selection.method.value}{
-                    self.feature_selection.n_features
-                }"
+                f"{self.feature_selection.method.value}{self.feature_selection.n_features}"
             )
 
         if self.model.tune_hyperparams:
