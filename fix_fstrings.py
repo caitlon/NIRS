@@ -1,20 +1,6 @@
-#!/usr/bin/env python
-"""
-Script to fix multiline f-strings in Python files.
-
-This script finds f-strings with line breaks inside curly braces
-and converts them to single-line f-strings that are compatible with
-older Python versions.
-
-Usage:
-    python fix_fstrings.py [file1 file2 ...]
-
-If no files are specified, it will scan all Python files in the current directory.
-"""
-
-from pathlib import Path
 import re
 import sys
+from pathlib import Path
 
 
 def fix_multiline_fstrings(file_path):
