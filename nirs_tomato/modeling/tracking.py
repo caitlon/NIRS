@@ -45,15 +45,21 @@ def setup_mlflow(
             experiment_id = mlflow.create_experiment(
                 name=experiment_name, artifact_location=artifacts_uri
             )
-            logger.info(f"Created new experiment '{
-                experiment_name}' with artifacts at {artifacts_uri}")
+            logger.info(
+                f"Created new experiment '{
+                    experiment_name
+                }' with artifacts at {artifacts_uri}"
+            )
         else:
             experiment_id = mlflow.create_experiment(name=experiment_name)
             logger.info(f"Created new experiment '{experiment_name}'")
     else:
         experiment_id = experiment.experiment_id
-        logger.info(f"Using existing experiment '{
-            experiment_name}' (ID: {experiment_id})")
+        logger.info(
+            f"Using existing experiment '{experiment_name}' (ID: {
+                experiment_id
+            })"
+        )
 
     return experiment_id
 
@@ -159,7 +165,7 @@ def log_model(
         conda_env: Conda environment specification
         signature: Model signature (input/output schema)
         input_example: Example input for the model
-    """
+    """  
     if not mlflow.active_run():
         logger.warning("No active MLflow run. Model will not be logged.")
         return
@@ -202,9 +208,8 @@ def log_model(
 
 
 def log_figure(
-        fig: plt.Figure,
-        artifact_path: str,
-        close_figure: bool = True) -> None:
+    fig: plt.Figure, artifact_path: str, close_figure: bool = True
+) -> None:
     """
     Log a matplotlib figure to MLflow.
 
@@ -271,11 +276,12 @@ def create_remote_tracking_uri(
 
     Returns:
         Tracking URI string
-    """
+    """  
     if storage_type == "s3":
         if endpoint_url:
-            tracking_uri = f"{
-                storage_type}://{bucket_name}?endpoint_url={endpoint_url}"
+            tracking_uri = (
+                f"{storage_type}://{bucket_name}?endpoint_url={endpoint_url}"
+            )
         else:
             tracking_uri = f"{storage_type}://{bucket_name}"
     else:

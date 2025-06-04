@@ -57,7 +57,7 @@ def train_regression_model(
 
     Returns:
         Trained regression model
-    """
+    """  
     # Configure logging
     logger = logging.getLogger(__name__)
     log_level = logging.INFO if verbose else logging.WARNING
@@ -87,7 +87,8 @@ def train_regression_model(
             "kernel": "rbf",
             "C": 1.0,
             "epsilon": 0.1,
-            "gamma": "scale"}
+            "gamma": "scale",
+        }
         params = {**default_params, **model_params}
         model = SVR(**params)
 
@@ -226,7 +227,9 @@ def evaluate_regression_model(
             "rmse": np.sqrt(mean_squared_error(y_test, y_test_pred)),
             "mae": mean_absolute_error(y_test, y_test_pred),
             "r2": r2_score(y_test, y_test_pred),
-            "explained_variance": explained_variance_score(y_test, y_test_pred),
+            "explained_variance": explained_variance_score(
+                y_test, y_test_pred
+            ),
         }
 
     # Prepare results
@@ -344,7 +347,11 @@ def hyperparameter_search(
 
     # Run search
     if verbose:
-        logger.info(f"Starting hyperparameter search for {model_type.upper()} with {n_iter} iterations...")
+        logger.info(
+            f"Starting hyperparameter search for {model_type.upper()} with {
+                n_iter
+            } iterations..."
+        )
 
     start_time = time.time()
     search.fit(X_train, y_train)
@@ -353,7 +360,8 @@ def hyperparameter_search(
     if verbose:
         search_time = end_time - start_time
         logger.info(
-            f"Hyperparameter search completed in {search_time:.2f} seconds")
+            f"Hyperparameter search completed in {search_time:.2f} seconds"
+        )
         logger.info(f"Best parameters: {search.best_params_}")
         logger.info(f"Best score: {search.best_score_:.4f}")
 
@@ -364,7 +372,8 @@ def hyperparameter_search(
         X_train=X_train,
         y_train=y_train,
         X_val=X_val,
-        y_val=y_val)
+        y_val=y_val,
+    )
 
     if verbose:
         logger.info(f"Validation RMSE: {results['val_metrics']['rmse']:.4f}")
@@ -382,8 +391,11 @@ def hyperparameter_search(
     return best_model, search_results
 
 
-def save_model(model: BaseEstimator, model_path: str,
-               model_info: Optional[Dict[str, Any]] = None) -> str:
+def save_model(
+    model: BaseEstimator,
+    model_path: str,
+    model_info: Optional[Dict[str, Any]] = None,
+) -> str:
     """
     Save a trained model to disk.
 
@@ -557,7 +569,8 @@ def compare_models(
     ax.set_xlabel("Models")
     ax.set_ylabel(metric.upper())
     ax.set_title(
-        f"Model Comparison - {metric.upper()} on {dataset.capitalize()} Set")
+        f"Model Comparison - {metric.upper()} on {dataset.capitalize()} Set"
+    )
     ax.grid(True, alpha=0.3, axis="y")
 
     # Rotate x-labels for better readability

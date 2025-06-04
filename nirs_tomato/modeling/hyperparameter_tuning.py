@@ -17,7 +17,10 @@ from sklearn.base import BaseEstimator
 from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import KFold, cross_val_score
 
-from .regression_models import evaluate_regression_model, train_regression_model
+from .regression_models import (
+    evaluate_regression_model,
+    train_regression_model,
+)
 
 
 def bayesian_hyperparameter_search(
@@ -55,7 +58,7 @@ def bayesian_hyperparameter_search(
 
     Returns:
         Tuple of (best_model, search_results)
-    """
+    """  
     # Configure logging
     logger = logging.getLogger(__name__)
     log_level = logging.INFO if verbose else logging.WARNING
@@ -63,8 +66,9 @@ def bayesian_hyperparameter_search(
 
     # Create study name if not provided
     if study_name is None:
-        study_name = f"{model_type}_optimization_{
-            time.strftime('%Y%m%d_%H%M%S')}"
+        study_name = (
+            f"{model_type}_optimization_{time.strftime('%Y%m%d_%H%M%S')}"
+        )
 
     # Set up cross-validation
     cv_folds = KFold(n_splits=cv, shuffle=True, random_state=random_state)
@@ -73,7 +77,8 @@ def bayesian_hyperparameter_search(
     def objective(trial: optuna.Trial) -> float:
         # Get hyperparameters based on the model type
         params = _get_hyperparameters_for_trial(
-            trial, model_type, random_state)
+            trial, model_type, random_state
+        )
 
         try:
             # Train the model with current hyperparameters
@@ -93,7 +98,8 @@ def bayesian_hyperparameter_search(
                 y_train,
                 cv=cv_folds,
                 scoring=scoring,
-                n_jobs=-1)
+                n_jobs=-1,
+            )
 
             # Calculate mean CV score
             mean_score = np.mean(cv_scores)
@@ -132,16 +138,20 @@ def bayesian_hyperparameter_search(
     if verbose:
         logger.info(
             f"Starting Bayesian hyperparameter optimization for {
-                model_type.upper()} model")
-        logger.info(f"Running {n_trials} trials with {
-                    cv}-fold cross-validation")
+                model_type.upper()
+            } model"
+        )
+        logger.info(
+            f"Running {n_trials} trials with {cv}-fold cross-validation"
+        )
 
     # Run optimization
     study.optimize(
         objective,
         n_trials=n_trials,
         timeout=timeout,
-        show_progress_bar=verbose)
+        show_progress_bar=verbose,
+    )
 
     # Calculate elapsed time
     elapsed_time = time.time() - start_time
@@ -189,7 +199,8 @@ def bayesian_hyperparameter_search(
             X_train=X_train,
             y_train=y_train,
             X_val=X_val,
-            y_val=y_val)
+            y_val=y_val,
+        )
 
         if verbose:
             logger.info("Validation metrics with best parameters:")
@@ -263,10 +274,14 @@ def _get_hyperparameters_for_trial(
     elif model_type == "xgb":
         return {
             "n_estimators": trial.suggest_int("n_estimators", 50, 500),
-            "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+            "learning_rate": trial.suggest_float(
+                "learning_rate", 0.01, 0.3, log=True
+            ),
             "max_depth": trial.suggest_int("max_depth", 3, 10),
             "subsample": trial.suggest_float("subsample", 0.5, 1.0),
-            "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0),
+            "colsample_bytree": trial.suggest_float(
+                "colsample_bytree", 0.5, 1.0
+            ),
             "gamma": trial.suggest_float("gamma", 0, 5),
             "min_child_weight": trial.suggest_int("min_child_weight", 1, 10),
             "random_state": random_state,
@@ -275,14 +290,22 @@ def _get_hyperparameters_for_trial(
     elif model_type == "lgbm":
         return {
             "n_estimators": trial.suggest_int("n_estimators", 50, 500),
-            "learning_rate": trial.suggest_float("learning_rate", 0.01, 0.3, log=True),
+            "learning_rate": trial.suggest_float(
+                "learning_rate", 0.01, 0.3, log=True
+            ),
             "num_leaves": trial.suggest_int("num_leaves", 20, 150),
             "max_depth": trial.suggest_int("max_depth", -1, 50),
-            "min_child_samples": trial.suggest_int("min_child_samples", 5, 100),
+            "min_child_samples": trial.suggest_int(
+                "min_child_samples", 5, 100
+            ),
             "subsample": trial.suggest_float("subsample", 0.5, 1.0),
-            "colsample_bytree": trial.suggest_float("colsample_bytree", 0.5, 1.0),
+            "colsample_bytree": trial.suggest_float(
+                "colsample_bytree", 0.5, 1.0
+            ),
             "reg_alpha": trial.suggest_float("reg_alpha", 0.0, 10.0, log=True),
-            "reg_lambda": trial.suggest_float("reg_lambda", 0.0, 10.0, log=True),
+            "reg_lambda": trial.suggest_float(
+                "reg_lambda", 0.0, 10.0, log=True
+            ),
             "random_state": random_state,
         }
 
